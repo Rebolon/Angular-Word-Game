@@ -1,5 +1,5 @@
 import { NgFor } from '@angular/common';
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AlphabetGame } from '../services/alphabet-game.interface';
 import { LetterComponent } from './letter.component';
 
@@ -15,7 +15,7 @@ import { LetterComponent } from './letter.component';
   `,
   styleUrls: ['./grid.scss'],
 })
-export class GridComponent {
+export class GridFailingComponent {
   @Input({ required: true }) game!: AlphabetGame;
   protected grid = Array<string[]>
   

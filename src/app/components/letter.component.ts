@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { BoardCase } from '../services/alphabet-game.interface';
 
 @Component({
   selector: 'my-letter',
@@ -9,5 +10,5 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./letter.scss'],
 })
 export class LetterComponent {
-  @Input({ required: true }) value!: string;
+  @Input({ required: true }) value!: BoardCase;
 }
