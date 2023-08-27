@@ -14,12 +14,12 @@ import { AlphabetGame } from './services/alphabet-game.interface';
   providers: [Alphabet, Boggle],
   template: `
   <my-game-select [selected]="defaultGame" (selected)="onSelected($event)"></my-game-select>
-  <my-grid [game]="game"></my-grid>
+  <my-grid *ngIf="game" [game]="game"></my-grid>
   `,
 })
 export class AppComponent {
   protected defaultGame = GameType.Alphabet
-  protected game: AlphabetGame = inject(Boggle);
+  protected game!: AlphabetGame;
 
   onSelected(game: any) {
     switch (game) {

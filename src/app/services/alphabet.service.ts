@@ -18,8 +18,9 @@ export class Alphabet implements AlphabetGame {
     let values: BoardCase[][] = [];
 
     for (let row = 0; row < grid.rows; row++) {
+      const rowValues: BoardCase[] = []
       for (let col = 0; col < grid.cols; col++) {
-        values[row][col] = {
+        rowValues.push({
           coordinates: {
             x: row,
             y: col,
@@ -30,8 +31,10 @@ export class Alphabet implements AlphabetGame {
             // @todo
             return true;
           }
-        };
+        });
       }
+
+      values[row] = rowValues;
     }
 
     return {

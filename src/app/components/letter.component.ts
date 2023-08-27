@@ -5,10 +5,10 @@ import { BoardCase } from '../services/alphabet-game.interface';
   selector: 'my-letter',
   standalone: true,
   template: `
-    <div class="flex-item">{{value}}</div>
+    <div class="flex-item">{{case.value.value}}</div>
   `,
   styleUrls: ['./letter.scss'],
 })
 export class LetterComponent {
-  @Input({ required: true }) value!: BoardCase;
+  @Input({ required: true }) case!: BoardCase;
 }
