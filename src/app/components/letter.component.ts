@@ -12,7 +12,7 @@ import { NgClass } from '@angular/common';
       [ngClass]="{hover: mouseOver, clicked: isClicked()}" 
       (mouseover)="mouseOver = true" 
       (mouseout)="mouseOver = false"
-      (click)="case.selectCase(case)">{{case.value.value}}</div>
+      (click)="click()">{{case.value.value}}</div>
   `,
   styleUrls: ['./letter.scss'],
 })
@@ -22,5 +22,18 @@ export class LetterComponent {
 
   protected isClicked(): boolean {
     return this.case.getStatus() === CaseStatus.CLICKED;
+  }
+
+  protected click(): void {
+    switch (this.case.getStatus()) {
+      case CaseStatus.CLEAR: 
+        this.case.selectCase();
+        break;
+      case CaseStatus.CLICKED: 
+        this.case.unSelectCase();
+        break;
+      default:
+        console.warn('LetterComponent', 'click', 'unknown case status', this.case.getStatus());
+    }
   }
 }
