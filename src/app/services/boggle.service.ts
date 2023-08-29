@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AlphabetGame, BoardCase, BoardConfig, CaseStatus, CaseValue, Game } from './alphabet-game.interface';
+import { CaseBehavior } from './case-behavior.service';
 
 @Injectable()
 export class Boggle implements AlphabetGame {
@@ -47,23 +48,20 @@ export class Boggle implements AlphabetGame {
     }
 
     const grid = this.getGrid();
+    const caseBehavior = new CaseBehavior(grid);
     let values: BoardCase[][] = []
 
     for (let row = 0; row < grid.rows; row++) {
       const rowValues: BoardCase[] = []
       for (let col = 0; col < grid.cols; col++) {
-        rowValues.push({
-          coordinates: {
+        rowValues.push(new BoardCase(
+          caseBehavior,
+          {
             x: row,
             y: col,
           },
-          status: CaseStatus.CLEAR,
-          value: this.getRandomLetter(),
-          canBeClicked() {
-            // @todo
-            return true;
-          }
-        });
+          this.getRandomLetter())
+        );
       }
 
       values[row] = rowValues;
@@ -71,7 +69,8 @@ export class Boggle implements AlphabetGame {
 
     this.currentGame = {
       gridValues: values,
-      boardConfig: grid
+      boardConfig: grid,
+      caseBehavior
     }
 
     return this.currentGame;

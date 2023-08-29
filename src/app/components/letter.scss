@@ -19,3 +19,14 @@
   float: left;
   padding-top: 100%;
 }
+
+.hover {
+  font-size: xxx-large;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.clicked {
+  @extend .hover;
+  background-color: chocolate;
+}
