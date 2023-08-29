@@ -4,8 +4,8 @@ import { AlphabetGame, BoardCase, BoardConfig, CaseStatus, CaseValue, Game } fro
 @Injectable()
 export class Boggle implements AlphabetGame {
   private readonly alphabet: CaseValue[][] = [];
-
   private alphabetDices: CaseValue[][] = [];
+  private currentGame!: Game;
 
   constructor() {
     const letters = [
@@ -42,6 +42,10 @@ export class Boggle implements AlphabetGame {
   }
 
   start(): Game {
+    if (this.currentGame) {
+      return this.currentGame;
+    }
+
     const grid = this.getGrid();
     let values: BoardCase[][] = []
 
@@ -65,10 +69,12 @@ export class Boggle implements AlphabetGame {
       values[row] = rowValues;
     }
 
-    return {
+    this.currentGame = {
       gridValues: values,
       boardConfig: grid
     }
+
+    return this.currentGame;
   }
 
   // @deprecated to move private

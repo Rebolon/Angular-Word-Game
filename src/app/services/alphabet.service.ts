@@ -4,6 +4,7 @@ import { AlphabetGame, Game, BoardConfig, CaseValue, BoardCase, CaseStatus } fro
 @Injectable()
 export class Alphabet implements AlphabetGame {
   private readonly alphabet: CaseValue[] = [];
+  private currentGame!: Game;
 
   constructor() {
     [...Array(26)].map((_, i) =>
@@ -14,6 +15,10 @@ export class Alphabet implements AlphabetGame {
   }
 
   start(): Game {
+    if (this.currentGame) {
+      return this.currentGame;
+    }
+
     const grid = this.getGrid();
     let values: BoardCase[][] = [];
 
@@ -37,10 +42,12 @@ export class Alphabet implements AlphabetGame {
       values[row] = rowValues;
     }
 
-    return {
+    this.currentGame = {
       gridValues: values,
       boardConfig: grid
     }
+
+    return this.currentGame;
   }
 
   // @deprecated to move private
