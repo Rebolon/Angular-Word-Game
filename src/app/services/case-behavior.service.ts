@@ -1,4 +1,4 @@
-import { BoardCase, BoardConfig, CaseStatus } from './alphabet-game.interface';
+import { BoardCase, BoardConfig, CaseStatus, Coordinates } from './alphabet-game.interface';
 
 // @todo where is the right place for this ?
 // * in the Game ?
@@ -19,6 +19,10 @@ export class CaseBehavior {
   }
 
   canSelectCase(boardCase: BoardCase): boolean {
+    if (!this.isInTheBoard(boardCase)) {
+      return false;
+    }
+
     if (this.isFirstCaseInSeries()) {
       return true;
     }
@@ -62,8 +66,13 @@ export class CaseBehavior {
     return !!words.find((word) => word === currentWord);
   }
 
+  private isInTheBoard(boardCase: BoardCase): boolean {
+    return boardCase.coordinates.x >= 0 && boardCase.coordinates.x < this.boardConfig.cols
+      && boardCase.coordinates.y >= 0 && boardCase.coordinates.y < this.boardConfig.rows;
+  }
+
   private isFirstCaseInSeries(): boolean {
-    return !!this.cases.length
+    return !this.cases.length
   }
 
   private isAlreadyClickedCaseInCurrentSeries(boardCase: BoardCase): boolean {
@@ -77,53 +86,57 @@ export class CaseBehavior {
       throw new Error('No cases in series');
     }
 
-    let allowedCoordinates = {x: [] as number[], y: [] as number[]};
-    allowedCoordinates.x = this.buildAllowedCoordinatesAbscisses(boardCase);
-    allowedCoordinates.y = this.buildAllowedCoordinatesOrdinates(boardCase);
+    const allowedCoordinates = this.buildAllowedCoordinates(lastClickedCase);
 
-    return !!(allowedCoordinates.x.find((value) => value === boardCase.coordinates.x)
-      && allowedCoordinates.y.find((value) => value === boardCase.coordinates.y))
+    return !!allowedCoordinates.find((coordinates) => 
+      coordinates.x === boardCase.coordinates.x 
+      && coordinates.y === boardCase.coordinates.y)
   }
 
-  private buildAllowedCoordinatesAbscisses(lastClickedCase: BoardCase): number[] {
-    let allowedCoordinates: number[] = [];
-    if (lastClickedCase.coordinates.x <= 0) {
-      allowedCoordinates = [0, 1, ];
-    }
+  private buildAllowedCoordinates(lastClickedCase: BoardCase): Coordinates[] {
+    const allowedCoordinates = [] as Coordinates[];
+    const abscissas = this.buildAllowedCoordinatesAbscissa(lastClickedCase);
+    const ordinates = this.buildAllowedCoordinatesOrdinate(lastClickedCase);
 
-    if (lastClickedCase.coordinates.x <= 1) {
-      allowedCoordinates = [0, 1, 2];
-    }
+    abscissas.forEach((abscissa) => {
+      ordinates.forEach((ordinate) => {
+        const newCoordinate = {
+          x: abscissa,
+          y: ordinate
+        };
 
-    if (lastClickedCase.coordinates.x >= (this.boardConfig.cols-1)) {
-      allowedCoordinates = [this.boardConfig.cols-2, this.boardConfig.cols-1, ];
-    }
-
-    if (lastClickedCase.coordinates.x >= (this.boardConfig.cols-2)) {
-      allowedCoordinates = [this.boardConfig.cols-2, this.boardConfig.cols-1, this.boardConfig.cols, ];
-    }
-
+        if (JSON.stringify(newCoordinate) !== JSON.stringify(lastClickedCase.coordinates)) {
+          allowedCoordinates.push(newCoordinate);
+        }
+      })
+    })
+    
     return allowedCoordinates;
   }
 
-  private buildAllowedCoordinatesOrdinates(lastClickedCase: BoardCase): number[] {
-      let allowedCoordinates: number[] = [];
-      if (lastClickedCase.coordinates.y <= 0) {
-        allowedCoordinates = [0, 1, ];
+  private buildAllowedCoordinatesAbscissa(lastClickedCase: BoardCase): number[] {
+    let allowedAbscissa: number[] = [];
+    for (let i=-1; i<=1; i++) {
+      const newAbscissa = lastClickedCase.coordinates.x+i;
+      if (newAbscissa >= 0 
+        && newAbscissa < this.boardConfig.cols) {
+        allowedAbscissa.push(newAbscissa);
+      }
+    }
+
+    return allowedAbscissa;
+  }
+
+  private buildAllowedCoordinatesOrdinate(lastClickedCase: BoardCase): number[] {
+      let allowedOrdinate: number[] = [];
+      for (let i=-1; i<=1; i++) {
+        const newOrdinate = lastClickedCase.coordinates.y+i;
+        if (newOrdinate >= 0 
+          && newOrdinate < this.boardConfig.rows) {
+          allowedOrdinate.push(newOrdinate);
+        }
       }
   
-      if (lastClickedCase.coordinates.y <= 1) {
-        allowedCoordinates = [0, 1, 2];
-      }
-  
-      if (lastClickedCase.coordinates.y >= (this.boardConfig.rows-1)) {
-        allowedCoordinates = [this.boardConfig.rows-2, this.boardConfig.rows-1, ];
-      }
-  
-      if (lastClickedCase.coordinates.y >= (this.boardConfig.rows-2)) {
-        allowedCoordinates = [this.boardConfig.rows-2, this.boardConfig.rows-1, this.boardConfig.rows, ];
-      }
-  
-      return allowedCoordinates;
+      return allowedOrdinate;
     }
 }
