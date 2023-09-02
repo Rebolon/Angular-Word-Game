@@ -40,7 +40,15 @@ export class CaseBehavior {
   }
 
   canUnSelectCase(boardCase: BoardCase): boolean {
-    return this.isAlreadyClickedCaseInCurrentSeries(boardCase);
+    if (!this.isInTheBoard(boardCase)) {
+      return false;
+    }
+
+    if (this.isLastCaseInSeries(boardCase)) {
+      return true;
+    }
+
+    return false;
   }
 
   selectCase(boardCase: BoardCase): void {
@@ -50,6 +58,15 @@ export class CaseBehavior {
     }
 
     this.cases.push(boardCase);
+  }
+
+  unSelectCase(boardCase: BoardCase): void {
+    if (!this.canUnSelectCase(boardCase)) {
+      console.info('CaseBehavior', 'unselectCase', this.cases, boardCase);
+      return;
+    }
+
+    this.cases = this.cases.filter((currentBoardCase: BoardCase) => currentBoardCase !== boardCase);
   }
 
   getWords():  BoardCase[][] {
@@ -73,6 +90,10 @@ export class CaseBehavior {
 
   private isFirstCaseInSeries(): boolean {
     return !this.cases.length
+  }
+
+  private isLastCaseInSeries(boardCase: BoardCase): boolean {
+    return this.cases.at(-1) === boardCase;
   }
 
   private isAlreadyClickedCaseInCurrentSeries(boardCase: BoardCase): boolean {

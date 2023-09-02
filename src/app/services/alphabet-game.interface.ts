@@ -43,18 +43,21 @@ export class BoardCase implements BoardCase {
   }
 
   selectCase() {
+    if (!this.caseBehavior.canSelectCase(this)) {
+      return;
+    }
     this.status = CaseStatus.CLICKED;
     this.caseBehavior.selectCase(this);
   }
 
   
   unSelectCase() {
-    if (this.caseBehavior.canUnSelectCase(this)) {
+    if (!this.caseBehavior.canUnSelectCase(this)) {
       return;
     }
     
     this.status = CaseStatus.CLEAR;
-    this.caseBehavior.selectCase(this);
+    this.caseBehavior.unSelectCase(this);
   }
 
   getStatus(): CaseStatus {
