@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { GameType, GameType2LabelMapping } from '../game.model';
+import { GameType, GameType2LabelMapping } from '../services/game.model';
 import { NgFor } from '@angular/common';
 import { GameSelectorForm } from '../game.form';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -10,16 +10,18 @@ import { ReactiveFormsModule } from '@angular/forms';
   imports: [NgFor, ReactiveFormsModule],
   template: `
     <form 
-      [formGroup]="form">
+      [formGroup]="form"
+      (ngSubmit)="selectGame()">
       <select
             formControlName="game"
-            (ngModelChange)="changeGame($event)"
           >
-        <option value="-1">Choose Game</option>
+        <option value="-1">Choix du mode de jeu</option>
         <option *ngFor="let gameKey of form.getGamesKeys()" [ngValue]="gameKey">
           {{ form.getGameValue(gameKey) }}
         </option>
       </select>
+
+      <button type="submit">Jouer</button>
     </form>
   `,
   styleUrls: ['./game-select.scss'],
@@ -29,11 +31,11 @@ export class GameSelectComponent {
   @Output('selected') game: EventEmitter<GameType> = new EventEmitter();
   protected form: GameSelectorForm = new GameSelectorForm();
 
-  changeGame(value: GameType): void {
-    if (!this.form.controls['game'].valid) {
+  selectGame(): void {
+    if (this.form.invalid) {
       return;
     }
     
-    this.game.emit(value)
+    this.game.emit(this.form.value.game)
   }
 }

@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { BoardCase, CaseStatus } from '../services/alphabet-game.interface';
 import { NgClass } from '@angular/common';
+import { CaseBehavior } from '../services/case-behavior.service';
 
 @Component({
   selector: 'my-letter',
@@ -17,6 +18,7 @@ import { NgClass } from '@angular/common';
   styleUrls: ['./letter.scss'],
 })
 export class LetterComponent {
+  @Input({ required: true }) behavior!: CaseBehavior;
   @Input({ required: true }) case!: BoardCase;
   protected mouseOver = false;
 
@@ -27,10 +29,10 @@ export class LetterComponent {
   protected click(): void {
     switch (this.case.getStatus()) {
       case CaseStatus.CLEAR: 
-        this.case.selectCase();
+        this.behavior.selectCase(this.case);
         break;
       case CaseStatus.CLICKED: 
-        this.case.unSelectCase();
+        this.behavior.unSelectCase(this.case);
         break;
       default:
         console.warn('LetterComponent', 'click', 'unknown case status', this.case.getStatus());

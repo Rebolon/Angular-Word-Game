@@ -1,8 +1,7 @@
+import { GameType } from "./game.model";
 import { CaseBehavior } from "./case-behavior.service";
 
 export interface Game {
-  // @todo rename
-  readonly gridValues: BoardCase[][];
   readonly boardConfig: BoardConfig;
   readonly caseBehavior: CaseBehavior;
 }
@@ -29,35 +28,20 @@ export interface Coordinates {
 export interface BoardCase {
   readonly coordinates: Coordinates,
   readonly value: CaseValue,
-  canBeClicked(boardCase: BoardCase): boolean,
-  selectCase(boardCase: BoardCase): void,
+  selectCase(): void,
+  unSelectCase(): void,
   getStatus(): CaseStatus,
-  setStatus(status: CaseStatus): void,
 }
 
 export class BoardCase implements BoardCase {
-  constructor(protected caseBehavior: CaseBehavior, readonly coordinates: Coordinates, readonly value: CaseValue, protected status: CaseStatus = CaseStatus.CLEAR) {}
+  constructor(readonly coordinates: Coordinates, readonly value: CaseValue, protected status: CaseStatus = CaseStatus.CLEAR) {}
   
-  canBeClicked() {
-    return this.caseBehavior.canSelectCase(this);
-  }
-
-  selectCase() {
-    if (!this.caseBehavior.canSelectCase(this)) {
-      return;
-    }
+  selectCase(): void {
     this.status = CaseStatus.CLICKED;
-    this.caseBehavior.selectCase(this);
   }
-
   
-  unSelectCase() {
-    if (!this.caseBehavior.canUnSelectCase(this)) {
-      return;
-    }
-    
+  unSelectCase(): void { 
     this.status = CaseStatus.CLEAR;
-    this.caseBehavior.unSelectCase(this);
   }
 
   getStatus(): CaseStatus {
@@ -66,6 +50,8 @@ export class BoardCase implements BoardCase {
 }
 
 export interface AlphabetGame {
+  readonly gameType: GameType;
+
   start(): Game;
 
   // @deprecated

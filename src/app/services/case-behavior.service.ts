@@ -1,21 +1,22 @@
-import { BoardCase, BoardConfig, CaseStatus, Coordinates } from './alphabet-game.interface';
+import { BoardCase, BoardConfig, Coordinates } from './alphabet-game.interface';
 
 // @todo where is the right place for this ?
 // * in the Game ?
 // * int the BoardCase ?
 export class CaseBehavior {
-  private cases: BoardCase[] = [];
-  private words: BoardCase[][] = [[]];
+  private selectedCases: BoardCase[] = [];
+  private words: string[] = [];
 
-  constructor (private boardConfig: BoardConfig) {}
+  constructor (private boardConfig: BoardConfig, public readonly gridCases: BoardCase[][]) {}
 
   validateWord(): void {
     if (this.isAlreadyExistingWord()) {
-      return;
+      throw new Error("Already existing word");
     }
 
-    this.words.push(this.cases);
-    this.cases = [];
+    this.words.push(this.getWordInCurrentSerie());
+    Array.from(this.selectedCases).reverse().forEach(boardCase => this.unSelectCase(boardCase))
+    this.selectedCases = [];
   }
 
   canSelectCase(boardCase: BoardCase): boolean {
@@ -53,34 +54,40 @@ export class CaseBehavior {
 
   selectCase(boardCase: BoardCase): void {
     if (!this.canSelectCase(boardCase)) {
-      console.info('CaseBehavior', 'selectCase', this.cases, boardCase);
+      console.info('CaseBehavior', 'selectCase', this.selectedCases, boardCase);
       return;
     }
 
-    this.cases.push(boardCase);
+    this.selectedCases.push(boardCase);
+    boardCase.selectCase();
   }
 
   unSelectCase(boardCase: BoardCase): void {
     if (!this.canUnSelectCase(boardCase)) {
-      console.info('CaseBehavior', 'unselectCase', this.cases, boardCase);
+      console.info('CaseBehavior', 'unselectCase', this.selectedCases, boardCase);
       return;
     }
 
-    this.cases = this.cases.filter((currentBoardCase: BoardCase) => currentBoardCase !== boardCase);
+    this.selectedCases = this.selectedCases.filter((currentBoardCase: BoardCase) => currentBoardCase !== boardCase);
+    boardCase.unSelectCase();
   }
 
-  getWords():  BoardCase[][] {
+  getWords():  string[] {
     return this.words;
   };
 
   private isAlreadyExistingWord(): boolean {
-    const words: string[] = this.words.map((boardCases) => {
-      return boardCases.map((boardCase) => boardCase.value.value).reduce((boardCaseValue, acc) => acc + boardCaseValue)
-    })
-
-    const currentWord: string = this.cases.map((boardCase) => boardCase.value.value).reduce((boardCaseValue, acc) => acc + boardCaseValue);
+    const words: string[] = this.getWords();
+    const currentWord: string = this.getWordInCurrentSerie();
 
     return !!words.find((word) => word === currentWord);
+  }
+
+  private getWordInCurrentSerie(): string {
+    return this.selectedCases.length ?
+      this.selectedCases
+            .map((boardCase: BoardCase) => boardCase.value.value)
+            .reduce((boardCaseValue, accumulator = "") => `${accumulator}${boardCaseValue}`) : '';
   }
 
   private isInTheBoard(boardCase: BoardCase): boolean {
@@ -89,19 +96,19 @@ export class CaseBehavior {
   }
 
   private isFirstCaseInSeries(): boolean {
-    return !this.cases.length
+    return !this.selectedCases.length
   }
 
   private isLastCaseInSeries(boardCase: BoardCase): boolean {
-    return this.cases.at(-1) === boardCase;
+    return this.selectedCases.at(-1) === boardCase;
   }
 
   private isAlreadyClickedCaseInCurrentSeries(boardCase: BoardCase): boolean {
-    return !!this.cases.find((selectedBoardCase) => selectedBoardCase === boardCase);
+    return !!this.selectedCases.find((selectedBoardCase) => selectedBoardCase === boardCase);
   }
 
   private isAroundLastClickedCase(boardCase: BoardCase): boolean {
-    const lastClickedCase = this.cases.at(-1);
+    const lastClickedCase = this.selectedCases.at(-1);
 
     if (!lastClickedCase) {
       throw new Error('No cases in series');
