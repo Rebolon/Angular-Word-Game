@@ -6,8 +6,13 @@ import { BoardCase, BoardConfig, Coordinates } from './alphabet-game.interface';
 export class CaseBehavior {
   private selectedCases: BoardCase[] = [];
   private words: string[] = [];
+  private stopped: boolean = false;
 
   constructor (private boardConfig: BoardConfig, public readonly gridCases: BoardCase[][]) {}
+
+  stop(): void {
+    this.stopped = true;
+  }
 
   validateWord(): void {
     if (this.isAlreadyExistingWord()) {
@@ -20,6 +25,10 @@ export class CaseBehavior {
   }
 
   canSelectCase(boardCase: BoardCase): boolean {
+    if (this.isStopped()) {
+      return false;
+    }
+
     if (!this.isInTheBoard(boardCase)) {
       return false;
     }
@@ -41,6 +50,10 @@ export class CaseBehavior {
   }
 
   canUnSelectCase(boardCase: BoardCase): boolean {
+    if (this.isStopped()) {
+      return false;
+    }
+    
     if (!this.isInTheBoard(boardCase)) {
       return false;
     }
@@ -88,6 +101,10 @@ export class CaseBehavior {
       this.selectedCases
             .map((boardCase: BoardCase) => boardCase.value.value)
             .reduce((boardCaseValue, accumulator = "") => `${accumulator}${boardCaseValue}`) : '';
+  }
+
+  public isStopped(): boolean {
+    return this.stopped;
   }
 
   private isInTheBoard(boardCase: BoardCase): boolean {

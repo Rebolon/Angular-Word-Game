@@ -1,15 +1,18 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { AlphabetGame, BoardCase, Game } from '../services/alphabet-game.interface';
 import { LetterComponent } from './letter.component';
 import { WordsComponent } from './words.component';
+import { CountDownComponent } from './countdown.component';
 
 @Component({
   selector: 'my-grid',
   standalone: true,
-  imports: [NgFor, NgIf, LetterComponent, WordsComponent,],
+  imports: [NgFor, NgIf, LetterComponent, WordsComponent, CountDownComponent,],
   template: `
   <ng-container *ngIf="board">
+    <my-countdown [starTime]="10" (timeEnded)="stopGame()"/>
+
     <div *ngFor="let row of board.caseBehavior.gridCases" class="flex-container">
       <my-letter *ngFor="let col of row" [case]="col" [behavior]="board.caseBehavior"></my-letter>
     </div>
@@ -23,13 +26,11 @@ import { WordsComponent } from './words.component';
 })
 export class GridComponent implements OnChanges {
   @Input({ required: true }) game!: AlphabetGame;
-  @Output() startedGame: EventEmitter<Game> = new EventEmitter();
   protected board!: Game;
 
   public ngOnChanges(changes: SimpleChanges): void {
     const game = changes['game'].currentValue as unknown as AlphabetGame;
     this.board = game.start();
-    this.startedGame.emit(this.board);
   }
 
   protected getRows(): Array<BoardCase> {
@@ -47,5 +48,9 @@ export class GridComponent implements OnChanges {
   protected validateWord(): void {
     // @todo maybe validateWord should be on board, not on caseBehavior
     this.board.caseBehavior.validateWord();
+  }
+
+  protected stopGame(): void {
+    this.board.caseBehavior.stop();
   }
 }
