@@ -1,23 +1,62 @@
 import { Injectable } from '@angular/core';
-import { AlphabetGame, Grid } from './alphabet-game.interface';
+import { AlphabetGame, Game, BoardConfig, CaseValue, BoardCase, CaseStatus, Coordinates } from './alphabet-game.interface';
+import { CaseBehavior } from './case-behavior.service';
+import { GameType } from './game.model';
 
 @Injectable()
 export class Alphabet implements AlphabetGame {
-  private alphabet: Array<string> = [];
+  readonly gameType: GameType = GameType.Alphabet;
+  private readonly alphabet: CaseValue[] = [];
+  private currentGame!: Game;
 
   constructor() {
     [...Array(26)].map((_, i) =>
-      this.alphabet.push(String.fromCharCode(i + 97))
+      this.alphabet.push({
+        value: String.fromCharCode(i + 97).toLocaleUpperCase()
+      })
     );
   }
 
-  getRandomLetter(): string {
-    return this.alphabet[
-      Math.floor(Math.random() * this.alphabet.length)
-    ].toLocaleUpperCase();
+  start(): Game {
+    if (this.currentGame) {
+      return this.currentGame;
+    }
+
+    const grid = this.getGrid();
+    let values: BoardCase[][] = [];
+
+    for (let row = 0; row < grid.rows; row++) {
+      const rowValues: BoardCase[] = []
+      for (let col = 0; col < grid.cols; col++) {
+        rowValues.push(new BoardCase(
+          {
+            x: row,
+            y: col,
+          } as Coordinates,
+          this.getRandomLetter())
+        );
+      }
+
+      values[row] = rowValues;
+    }
+
+    this.currentGame = {
+      boardConfig: grid,
+      caseBehavior: new CaseBehavior(grid, values)
+    }
+
+    return this.currentGame;
   }
 
-  getGrid(): Grid {
+  // @deprecated to move private
+  getRandomLetter(): CaseValue {
+    return this.alphabet[
+      Math.floor(Math.random() * this.alphabet.length)
+    ];
+  }
+
+  // @deprecated to move private
+  getGrid(): BoardConfig {
     return {
       rows: 5,
       cols: 5,

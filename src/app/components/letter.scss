@@ -1,6 +1,6 @@
 .flex-item {
   margin: 5px;
-  //padding: 15px;
+  padding: 15px;
   color: black;
   font-family: monospace;
   font-weight: bold;
@@ -18,4 +18,15 @@
   content: '';
   float: left;
   padding-top: 100%;
+}
+
+.hover {
+  font-size: xxx-large;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.clicked {
+  @extend .hover;
+  background-color: chocolate;
 }
