@@ -7,8 +7,8 @@ import { delay, interval, map, takeWhile, tap } from 'rxjs';
   standalone: true,
   imports: [NgClass, NgIf, AsyncPipe],
   template: `
-    <div *ngIf="(displayCounter$ | async) === true">{{time$ | async}}</div>
-    <div *ngIf="(displayCounter$ | async) === false">{{endText}}</div>
+    <h2 *ngIf="(displayCounter$ | async) === true">{{time$ | async}}</h2>
+    <h2 *ngIf="(displayCounter$ | async) === false">{{endText}}</h2>
   `,
 })
 export class CountDownComponent {

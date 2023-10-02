@@ -11,7 +11,7 @@ import { CountDownComponent } from './countdown.component';
   imports: [NgFor, NgIf, LetterComponent, WordsComponent, CountDownComponent,],
   template: `
   <ng-container *ngIf="board">
-    <my-countdown [starTime]="10" (timeEnded)="stopGame()"/>
+    <my-countdown [starTime]="120" (timeEnded)="stopGame()"/>
 
     <div *ngFor="let row of board.caseBehavior.gridCases" class="flex-container">
       <my-letter *ngFor="let col of row" [case]="col" [behavior]="board.caseBehavior"></my-letter>

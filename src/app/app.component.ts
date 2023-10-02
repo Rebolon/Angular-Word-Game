@@ -15,10 +15,20 @@ import { AlphabetGame, Game } from './services/alphabet-game.interface';
   imports: [CommonModule, TitleComponent, TitleSelectedGameComponent, GridComponent, GameSelectComponent],
   providers: [Alphabet, Boggle],
   template: `
-  <my-title/>
-  <my-title-selected-game *ngIf="game" [game]="game" />
-  <my-game-select *ngIf="!game" [selected]="defaultGame" (selected)="onSelected($event)" />
-  <my-grid *ngIf="game" [game]="game" />
+    <header>
+      <my-title/>
+      <!--div id="score">Score: 0</div-->
+    </header>
+    <main>
+      <my-game-select *ngIf="!game" [selected]="defaultGame" (selected)="onSelected($event)" />
+      <ng-container *ngIf="game">
+        <my-title-selected-game [game]="game" />
+        <my-grid [game]="game" />
+      </ng-container>
+    </main>
+    <footer>
+
+    </footer>
   `,
 })
 export class AppComponent {
