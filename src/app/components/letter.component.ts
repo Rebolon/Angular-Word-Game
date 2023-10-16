@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { BoardCase, CaseStatus } from '../services/alphabet-game.interface';
+import { BoardCase, CaseStatus } from '../services/word-game.interface';
 import { NgClass } from '@angular/common';
 import { CaseBehavior } from '../services/case-behavior.service';
 

@@ -1,6 +1,6 @@
 import { NgFor, NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { Game } from '../services/alphabet-game.interface';
+import { Game } from '../services/word-game.interface';
 
 @Component({
   selector: 'my-words',

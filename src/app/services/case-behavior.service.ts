@@ -1,4 +1,7 @@
-import { BoardCase, BoardConfig, Coordinates } from './alphabet-game.interface';
+import { BehaviorSubject, from, switchMap, tap } from 'rxjs';
+import { Lang, db } from './database/db';
+import { BoardCase, BoardConfig, Coordinates } from './word-game.interface';
+import { liveQuery } from 'dexie';
 
 // @todo where is the right place for this ?
 // * in the Game ?
@@ -7,21 +10,46 @@ export class CaseBehavior {
   private selectedCases: BoardCase[] = [];
   private words: string[] = [];
   private stopped: boolean = false;
+  private currentWordInSerie$: BehaviorSubject<string> = new BehaviorSubject("");
+  private isRealWord$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  constructor (private boardConfig: BoardConfig, public readonly gridCases: BoardCase[][]) {}
+  constructor (private boardConfig: BoardConfig, public readonly gridCases: BoardCase[][]) {
+    // I dislike this way of using Subject, but for isntance it's enough. Needs better Declarative conception instead of this
+    this.currentWordInSerie$.pipe(
+      tap(word => console.log('word to validate:', word)),
+      switchMap((currentWordInSerie: string) => from(liveQuery(() => db.words.where("value").equalsIgnoreCase(currentWordInSerie).count()))),
+      tap((value) => console.log('debug', value))
+    ).subscribe((isRealWord: number) => this.isRealWord$.next(!!isRealWord))
+  }
 
   stop(): void {
     this.stopped = true;
   }
 
   validateWord(): void {
+    this.currentWordInSerie$.next(
+      this.selectedCases.length ?
+        this.selectedCases
+          .reverse()
+          .map((boardCase: BoardCase) => boardCase.value.value)
+          .reduce((boardCaseValue, accumulator = "") => `${accumulator}${boardCaseValue}`) : '');
+
     if (this.isAlreadyExistingWord()) {
       throw new Error("Already existing word");
     }
 
-    this.words.push(this.getWordInCurrentSerie());
+    if (this.hasMinimalLenght()) {
+      throw new Error("Minimal lenght not reached : 3 chars");
+    }
+
+    if (!this.isRealWord()) {
+      throw new Error("Unknown word in dictionnary");
+    }
+
+    this.words.push(this.currentWordInSerie$.getValue());
     Array.from(this.selectedCases).reverse().forEach(boardCase => this.unSelectCase(boardCase))
     this.selectedCases = [];
+    this.currentWordInSerie$.next("");
   }
 
   canSelectCase(boardCase: BoardCase): boolean {
@@ -89,22 +117,23 @@ export class CaseBehavior {
     return this.words;
   };
 
+  public isStopped(): boolean {
+    return this.stopped;
+  }
+
   private isAlreadyExistingWord(): boolean {
     const words: string[] = this.getWords();
-    const currentWord: string = this.getWordInCurrentSerie();
+    const currentWord: string = this.currentWordInSerie$.getValue();
 
     return !!words.find((word) => word === currentWord);
   }
 
-  private getWordInCurrentSerie(): string {
-    return this.selectedCases.length ?
-      this.selectedCases
-            .map((boardCase: BoardCase) => boardCase.value.value)
-            .reduce((boardCaseValue, accumulator = "") => `${accumulator}${boardCaseValue}`) : '';
+  private hasMinimalLenght(): boolean {
+    return this.currentWordInSerie$.getValue().length < 3;
   }
 
-  public isStopped(): boolean {
-    return this.stopped;
+  private isRealWord(): boolean {
+    return this.isRealWord$.getValue();
   }
 
   private isInTheBoard(boardCase: BoardCase): boolean {

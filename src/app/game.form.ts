@@ -4,7 +4,7 @@ import {
     FormGroup,
     Validators,
   } from '@angular/forms';
-import { GameType, GameType2LabelMapping } from './services/game.model'
+import { GameType, GameType2LabelMapping } from './services/word-game.interface'
 import { gameValidator } from './game.validator.form';
 
 // Hack because i cannot have a class property used inside constructor whereas i must call super before its usage

@@ -1,4 +1,4 @@
-import { BoardCase, BoardConfig, CaseStatus, CaseValue } from "./alphabet-game.interface";
+import { BoardCase, BoardConfig, CaseStatus, CaseValue } from "./word-game.interface";
 import { CaseBehavior } from "./case-behavior.service";
 
 describe('CaseBehavior', () => {
