@@ -19,10 +19,10 @@ export class WordsComponent {
   @Input() board!: Game;
 
   protected hasValidateWords(): boolean {
-    return this.board && !!this.board.caseBehavior.getWords().length
+    return this.board && !!this.board.gameBehavior.getWords().length
   }
 
   protected getWords(): string[] {
-    return this.board.caseBehavior.getWords();
+    return this.board.gameBehavior.getWords();
   }
 }

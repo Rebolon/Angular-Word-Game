@@ -1,8 +1,6 @@
-import { CaseBehavior } from "./case-behavior.service";
-
 export interface Game {
   readonly boardConfig: BoardConfig;
-  readonly caseBehavior: CaseBehavior; // @todo remove this from Game it should be a service thta interact with component
+  readonly gameBehavior: GameBehavior; // @todo remove this from Game it should be a service thta interact with component
   readonly scoring: GameScoring;
 }
 
@@ -23,6 +21,19 @@ export interface CaseValue {
 export interface Coordinates {
   x: number,
   y: number,
+}
+
+export interface GameBehavior {
+  readonly gridCases: BoardCase[][]
+  stop(): void
+  isStopped(): boolean
+  validateWord(): void
+  cancelSelectedWord(): void
+  canSelectCase(boardCase: BoardCase): boolean
+  canUnSelectCase(boardCase: BoardCase): boolean
+  selectCase(boardCase: BoardCase): void
+  unSelectCase(boardCase: BoardCase): void
+  getWords(): string[]
 }
 
 export interface BoardCase {
@@ -62,7 +73,7 @@ export const GameType2LabelMapping: Record<GameType, string> = {
 export interface AlphabetGame {
   readonly gameType: GameType;
 
-  start(): Game;
+  prepare(): Game;
 }
 
 export interface GameScoring {

@@ -1,25 +1,22 @@
-import { BehaviorSubject, from, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, from, map, switchMap, tap } from 'rxjs';
 import { Lang, db } from './database/db';
-import { BoardCase, BoardConfig, Coordinates } from './word-game.interface';
+import { BoardCase, BoardConfig, Coordinates, GameBehavior as GameBehaviorI } from './word-game.interface';
 import { liveQuery } from 'dexie';
 
 // @todo where is the right place for this ?
 // * in the Game ?
 // * int the BoardCase ?
-export class CaseBehavior {
+export class GameBehavior implements GameBehaviorI {
   private selectedCases: BoardCase[] = [];
   private words: string[] = [];
   private stopped: boolean = false;
   private currentWordInSerie$: BehaviorSubject<string> = new BehaviorSubject("");
   private isRealWord$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
+  debugCurrentWordInSerie$ = this.currentWordInSerie$.asObservable();
+  debugIsRealWord$ = this.isRealWord$.asObservable()
+
   constructor (private boardConfig: BoardConfig, public readonly gridCases: BoardCase[][]) {
-    // I dislike this way of using Subject, but for isntance it's enough. Needs better Declarative conception instead of this
-    this.currentWordInSerie$.pipe(
-      tap(word => console.log('word to validate:', word)),
-      switchMap((currentWordInSerie: string) => from(liveQuery(() => db.words.where("value").equalsIgnoreCase(currentWordInSerie).count()))),
-      tap((value) => console.log('debug', value))
-    ).subscribe((isRealWord: number) => this.isRealWord$.next(!!isRealWord))
   }
 
   stop(): void {
@@ -27,29 +24,43 @@ export class CaseBehavior {
   }
 
   validateWord(): void {
-    this.currentWordInSerie$.next(
-      this.selectedCases.length ?
+    // @todo le pb ici est que l'on inject le mot dans le Subject, qu'il est lu par le stream du constructeur, mais que la partie 
+    // query sur l'IndexedDb est asynchrone, ce qui place la demande dans l'eventLoop et on reprend l'execution du code ici
+    // et on repart dans la Query quand elle a répondu
+    // => pour corriger ça on peut supprimer le currentWordInSeries$ qui sert à rien
+    // On execute les premiers checks
+    // Puis on subscribe à la query sur IndexedDb et 
+    // Si ça marche on fait la tambouille d'ajout du mot et du clean
+    // Si ça marche pas on fait rien et on renvoi juste une erreur qui sera utilisé par le composant
+    const currentWord = this.selectedCases.length ?
         this.selectedCases
           .reverse()
           .map((boardCase: BoardCase) => boardCase.value.value)
-          .reduce((boardCaseValue, accumulator = "") => `${accumulator}${boardCaseValue}`) : '');
+          .reduce((boardCaseValue, accumulator = "") => `${accumulator}${boardCaseValue}`) : '';
 
-    if (this.isAlreadyExistingWord()) {
+    if (this.isAlreadyExistingWord(currentWord)) {
       throw new Error("Already existing word");
     }
 
-    if (this.hasMinimalLenght()) {
+    if (this.hasMinimalLenght(currentWord)) {
       throw new Error("Minimal lenght not reached : 3 chars");
     }
 
-    if (!this.isRealWord()) {
-      throw new Error("Unknown word in dictionnary");
-    }
+    this.isRealWord(currentWord).subscribe({
+      next: (isRealWord: boolean) => {
+        if (isRealWord) {
+          this.words.push(currentWord);
+          this.cancelSelectedWord();
+        } else {
+          throw new Error("Unknown word in dictionnary");
+        }
+      }
+    })
+  }
 
-    this.words.push(this.currentWordInSerie$.getValue());
+  cancelSelectedWord(): void {
     Array.from(this.selectedCases).reverse().forEach(boardCase => this.unSelectCase(boardCase))
     this.selectedCases = [];
-    this.currentWordInSerie$.next("");
   }
 
   canSelectCase(boardCase: BoardCase): boolean {
@@ -121,19 +132,24 @@ export class CaseBehavior {
     return this.stopped;
   }
 
-  private isAlreadyExistingWord(): boolean {
+  private isAlreadyExistingWord(currentWord: string): boolean {
     const words: string[] = this.getWords();
-    const currentWord: string = this.currentWordInSerie$.getValue();
+
+    console.log('isAlreadyExistingWord', words, currentWord);
 
     return !!words.find((word) => word === currentWord);
   }
 
-  private hasMinimalLenght(): boolean {
-    return this.currentWordInSerie$.getValue().length < 3;
+  private hasMinimalLenght(currentWord: string): boolean {
+    console.log('hasMinimalLenght', currentWord)
+    return currentWord.length < 3;
   }
 
-  private isRealWord(): boolean {
-    return this.isRealWord$.getValue();
+  private isRealWord(currentWord: string): Observable<boolean> {
+    return from(liveQuery(() => db.words.where("value").equalsIgnoreCase(currentWord).count())).pipe(
+      tap((value) => console.log('isRealWord', value)),
+      map((value: number) => !!value)
+    )
   }
 
   private isInTheBoard(boardCase: BoardCase): boolean {

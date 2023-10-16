@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AlphabetGame, BoardCase, BoardConfig, CaseStatus, CaseValue, Game, GameType } from '../word-game.interface';
-import { CaseBehavior } from '../case-behavior.service';
+import { GameBehavior } from '../game-behavior.service';
 import { BoggleScoring } from './boggle-scoring.service';
 
 @Injectable()
@@ -44,7 +44,7 @@ export class Boggle implements AlphabetGame {
     this.alphabetDices = structuredClone(this.alphabet);
   }
 
-  start(): Game {
+  prepare(): Game {
     if (this.currentGame) {
       return this.currentGame;
     }
@@ -69,21 +69,19 @@ export class Boggle implements AlphabetGame {
 
     this.currentGame = {
       boardConfig: grid,
-      caseBehavior: new CaseBehavior(grid, values),
+      gameBehavior: new GameBehavior(grid, values),
       scoring: new BoggleScoring()
     }
 
     return this.currentGame;
   }
 
-  // @deprecated to move private
   private getRandomLetter(): CaseValue {
     const dice = this.pickDice();
 
     return dice[Math.floor(Math.random() * dice.length)];
   }
 
-  // @deprecated to move private
   private getGrid(): BoardConfig {
     return {
       rows: 4,

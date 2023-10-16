@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AlphabetGame, Game, BoardConfig, CaseValue, BoardCase, CaseStatus, Coordinates, GameType } from '../word-game.interface';
-import { CaseBehavior } from '../case-behavior.service';
+import { GameBehavior } from '../game-behavior.service';
 import { AlphabetScoring } from './alphabet-scoring.service';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class Alphabet implements AlphabetGame {
     );
   }
 
-  start(): Game {
+  prepare(): Game {
     if (this.currentGame) {
       return this.currentGame;
     }
@@ -42,21 +42,19 @@ export class Alphabet implements AlphabetGame {
 
     this.currentGame = {
       boardConfig: grid,
-      caseBehavior: new CaseBehavior(grid, values),
+      gameBehavior: new GameBehavior(grid, values),
       scoring: new AlphabetScoring()
     }
 
     return this.currentGame;
   }
 
-  // @deprecated to move private
   private getRandomLetter(): CaseValue {
     return this.alphabet[
       Math.floor(Math.random() * this.alphabet.length)
     ];
   }
 
-  // @deprecated to move private
   private getGrid(): BoardConfig {
     return {
       rows: 5,

@@ -1,8 +1,8 @@
 import { BoardCase, BoardConfig, CaseStatus, CaseValue } from "./word-game.interface";
-import { CaseBehavior } from "./case-behavior.service";
+import { GameBehavior } from "./game-behavior.service";
 
-describe('CaseBehavior', () => {
-    let sut: CaseBehavior;
+describe('GameBehavior', () => {
+    let sut: GameBehavior;
     let caseValue: CaseValue = {value: "A"};
     let boardConfig: BoardConfig = {
         cols: 5,
@@ -12,14 +12,14 @@ describe('CaseBehavior', () => {
     beforeEach(() => {});
 
     it('can not click outside the board', () => {
-        sut = new CaseBehavior(boardConfig);
-        const boardCase = new BoardCase(sut, {x: 10, y: 10}, caseValue, CaseStatus.CLEAR);
+        sut = new GameBehavior(boardConfig);
+        const boardCase = new BoardCase(sut, {x: 10, y: 10}, caseValue);
         expect(sut.canSelectCase(boardCase)).toBeFalse();
     });
 
     it('can click anywhere in an empty board', () => {
-        sut = new CaseBehavior(boardConfig);
-        const boardCase = new BoardCase(sut, {x: 0, y: 0}, caseValue, CaseStatus.CLEAR);
+        sut = new GameBehavior(boardConfig);
+        const boardCase = new BoardCase(sut, {x: 0, y: 0}, caseValue);
         expect(sut.canSelectCase(boardCase)).toBeTrue();
     });
 
@@ -29,10 +29,10 @@ describe('CaseBehavior', () => {
             {x: 1, y: 2}, {x: 3, y: 2},
             {x: 1, y: 3}, {x: 2, y: 3}, {x: 3, y: 3},
         ].forEach(coordinates => {
-            sut = new CaseBehavior(boardConfig);
-            const clickedBoardCase = new BoardCase(sut, {x: 2, y: 2}, caseValue, CaseStatus.CLICKED);
+            sut = new GameBehavior(boardConfig);
+            const clickedBoardCase = new BoardCase(sut, {x: 2, y: 2}, caseValue);
             sut.selectCase(clickedBoardCase);
-            const newBoardCase = new BoardCase(sut, coordinates, {value: "Z"}, CaseStatus.CLICKED);
+            const newBoardCase = new BoardCase(sut, coordinates, {value: "Z"});
             expect(sut.canSelectCase(newBoardCase)).toBeTrue();
         });
     });
@@ -45,31 +45,31 @@ describe('CaseBehavior', () => {
             {x: 0, y: 3}, {x: 4, y: 3},
             {x: 0, y: 4}, {x: 1, y: 4}, {x: 2, y: 4},  {x: 3, y: 4}, {x: 4, y: 4},
         ].forEach(coordinates => {
-            sut = new CaseBehavior(boardConfig);
-            const clickedBoardCase = new BoardCase(sut, {x: 2, y: 2}, caseValue, CaseStatus.CLICKED);
+            sut = new GameBehavior(boardConfig);
+            const clickedBoardCase = new BoardCase(sut, {x: 2, y: 2}, caseValue);
             sut.selectCase(clickedBoardCase);
-            const newBoardCase = new BoardCase(sut, coordinates, {value: "Z"}, CaseStatus.CLICKED);
+            const newBoardCase = new BoardCase(sut, coordinates, {value: "Z"});
             expect(sut.canSelectCase(newBoardCase)).toBeFalse();
         });
     });
 
     it('can click on the last clicked selected case', () => {
-        sut = new CaseBehavior(boardConfig);
+        sut = new GameBehavior(boardConfig);
         const clickedCases = [
-            new BoardCase(sut, {x: 1, y: 2}, {value: "A"}, CaseStatus.CLICKED),
-            new BoardCase(sut, {x: 2, y: 2}, {value: "B"}, CaseStatus.CLICKED),
-            new BoardCase(sut, {x: 3, y: 2}, {value: "C"}, CaseStatus.CLICKED),
+            new BoardCase(sut, {x: 1, y: 2}, {value: "A"}),
+            new BoardCase(sut, {x: 2, y: 2}, {value: "B"}),
+            new BoardCase(sut, {x: 3, y: 2}, {value: "C"}),
         ];
         clickedCases.forEach(boardCase => sut.selectCase(boardCase));
         expect(sut.canUnSelectCase(clickedCases[2])).toBeTrue();
     });
 
     it('cannot click on not last clicked selected case', () => {
-        sut = new CaseBehavior(boardConfig);
+        sut = new GameBehavior(boardConfig);
         const clickedCases = [
-            new BoardCase(sut, {x: 1, y: 2}, {value: "A"}, CaseStatus.CLICKED),
-            new BoardCase(sut, {x: 2, y: 2}, {value: "B"}, CaseStatus.CLICKED),
-            new BoardCase(sut, {x: 3, y: 2}, {value: "C"}, CaseStatus.CLICKED),
+            new BoardCase(sut, {x: 1, y: 2}, {value: "A"}),
+            new BoardCase(sut, {x: 2, y: 2}, {value: "B"}),
+            new BoardCase(sut, {x: 3, y: 2}, {value: "C"}),
         ];
         clickedCases.forEach(boardCase => sut.selectCase(boardCase));
 

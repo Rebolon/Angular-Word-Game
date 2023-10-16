@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { BoardCase, CaseStatus } from '../services/word-game.interface';
+import { BoardCase, CaseStatus, GameBehavior } from '../services/word-game.interface';
 import { NgClass } from '@angular/common';
-import { CaseBehavior } from '../services/case-behavior.service';
 
 @Component({
   selector: 'my-letter',
@@ -18,7 +17,7 @@ import { CaseBehavior } from '../services/case-behavior.service';
   styleUrls: ['./letter.scss'],
 })
 export class LetterComponent {
-  @Input({ required: true }) behavior!: CaseBehavior;
+  @Input({ required: true }) behavior!: GameBehavior;
   @Input({ required: true }) case!: BoardCase;
   protected mouseOver = false;
 
