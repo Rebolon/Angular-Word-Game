@@ -2,7 +2,7 @@ import { GameScoring } from "../word-game.interface";
 
 export class AlphabetScoring implements GameScoring {
   calculateScore(words: string[]): number {
-    return parseInt(words.reduce((currentScore, word) => {
+    return words.reduce((currentScore, word) => {
       let score = currentScore ?? 0;
       if (word.length <= 2) {
         return score;
@@ -11,6 +11,6 @@ export class AlphabetScoring implements GameScoring {
       score += word.length;
 
       return score;
-    }))
+    }, 0)  
   }
 }
