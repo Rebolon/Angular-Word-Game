@@ -44,6 +44,7 @@
             ],
             "scripts": [],
             "serviceWorker": true,
+            "webWorkerTsConfig": "tsconfig.worker.json",
             "ngswConfigPath": "ngsw-config.json"
           },
           "configurations": {
