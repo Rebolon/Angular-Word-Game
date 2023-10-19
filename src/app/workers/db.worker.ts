@@ -1,31 +1,32 @@
-//import { HttpClient, HttpHeaders, HttpXhrBackend } from '@angular/common/http';
-//import { Observable, from, map, switchMap, toArray } from 'rxjs';
+/// <reference lib="webworker" />
 
+import { Observable, from, map, switchMap, toArray } from 'rxjs';
+import { ajax } from "rxjs/internal/ajax/ajax";
+import { Lang, Word, db } from '../services/database/db';
+import {AjaxResponse} from "rxjs/internal/ajax/AjaxResponse";
 
+/* */
 addEventListener('message', ({ data }) => {
-  postMessage(`worker response to ${data}`);
-});
-/*import { Lang, Word, db } from '../services/database/db';
-
-addEventListener('message', ({ data }) => {
-  populate().subscribe((promiseResult) => {
-    console.log('insert result', promiseResult);
-    postMessage(`worker response to ${data}`);
+  populate().subscribe({
+    next: (promiseResult) => {
+      postMessage(`INFO worker inserting data`);
+    },
+    complete: () => postMessage(`INFO worker complete db insert`),
+    error: (err) => postMessage(`ERROR from db worker ${err}`)
   })
 });
 
 function populate(): Observable<unknown> {
-  const httpClient = new HttpClient(new HttpXhrBackend({ 
-    build: () => new XMLHttpRequest() 
-  }));
-  
-  return httpClient.get('/assets/dictionnaries/fr/ods6.txt', {
-    headers: new HttpHeaders({
-       'Accept':'text'
-    }),
-    'responseType': 'text'
-  }).pipe(
-    switchMap(dic => from(dic.split(/\n/))),
+  const response$: Observable<AjaxResponse<string>> = ajax({
+    url: 'http://localhost:4200/assets/dictionnaries/fr/ods6.txt',
+    headers: {
+      "Accept": "text"
+    },
+    responseType: "text"
+  });
+
+  return response$.pipe(
+    switchMap(dic => from(dic.response.split(/\n/))),
     map(word => {
       return {
         lang: Lang.FR,
@@ -35,4 +36,5 @@ function populate(): Observable<unknown> {
     toArray(),
     switchMap((words) => from(db.words.bulkAdd(words)))
   )
-}*/
+}
+/* */
