@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { GameType, GameType2LabelMapping } from '../services/game.model';
+import { GameType, GameType2LabelMapping } from '../services/word-game.interface';
 import { NgFor } from '@angular/common';
 import { GameSelectorForm } from '../game.form';
 import { ReactiveFormsModule } from '@angular/forms';

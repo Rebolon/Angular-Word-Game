@@ -17,13 +17,13 @@ export class CountDownComponent {
   @Output() timeEnded: EventEmitter<true> = new EventEmitter();
   protected time$ = interval(1000).pipe(
     map((value: number) => this.starTime - value),
-    tap(value => {
+    tap((value: number) => {
       if (value === 0) {
         this.timeEnded.emit(true);
       }
     }),
     takeWhile((value: number) => value >= 0),
-    map(time => {
+    map((time: number) => {
       const h = Math.floor(time / 3600);
       const m = Math.floor(time % 3600 / 60);
       const s = Math.floor(time % 3600 % 60);

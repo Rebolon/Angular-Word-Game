@@ -1,23 +1,25 @@
 import { NgFor, NgIf } from '@angular/common';
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AlphabetGame, BoardCase, Game } from '../services/alphabet-game.interface';
+import { AlphabetGame, BoardCase, Game } from '../services/word-game.interface';
 import { LetterComponent } from './letter.component';
 import { WordsComponent } from './words.component';
 import { CountDownComponent } from './countdown.component';
+import { ScoreComponent } from './score.component';
 
 @Component({
   selector: 'my-grid',
   standalone: true,
-  imports: [NgFor, NgIf, LetterComponent, WordsComponent, CountDownComponent,],
+  imports: [NgFor, NgIf, LetterComponent, WordsComponent, CountDownComponent, ScoreComponent, ],
   template: `
   <ng-container *ngIf="board">
     <my-countdown [starTime]="120" (timeEnded)="stopGame()"/>
-
-    <div *ngFor="let row of board.caseBehavior.gridCases" class="flex-container">
-      <my-letter *ngFor="let col of row" [case]="col" [behavior]="board.caseBehavior"></my-letter>
+    <my-score *ngIf="board.gameBehavior.isStopped()" [gameScoring]="board.scoring" [words]="board.gameBehavior.getWords()"></my-score>
+    <div *ngFor="let row of board.gameBehavior.gridCases" class="flex-container">
+      <my-letter *ngFor="let col of row" [case]="col" [behavior]="board.gameBehavior"></my-letter>
     </div>
 
     <button (click)="validateWord()">Ajouter le mot</button>
+    <button (click)="cancelWord()">Annuler</button>
 
     <my-words [board]="board" />
   </ng-container>
@@ -30,7 +32,7 @@ export class GridComponent implements OnChanges {
 
   public ngOnChanges(changes: SimpleChanges): void {
     const game = changes['game'].currentValue as unknown as AlphabetGame;
-    this.board = game.start();
+    this.board = game.prepare();
   }
 
   protected getRows(): Array<BoardCase> {
@@ -46,11 +48,14 @@ export class GridComponent implements OnChanges {
   }
 
   protected validateWord(): void {
-    // @todo maybe validateWord should be on board, not on caseBehavior
-    this.board.caseBehavior.validateWord();
+    this.board.gameBehavior.validateWord();
+  }
+
+  protected cancelWord(): void {
+    this.board.gameBehavior.cancelSelectedWord();
   }
 
   protected stopGame(): void {
-    this.board.caseBehavior.stop();
+    this.board.gameBehavior.stop();
   }
 }

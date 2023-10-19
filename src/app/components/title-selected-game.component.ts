@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { GameType } from '../services/game.model';
-import { AlphabetGame } from '../services/alphabet-game.interface';
+import { GameType } from '../services/word-game.interface';
+import { AlphabetGame } from '../services/word-game.interface';
 
 @Component({
   selector: 'my-title-selected-game',
