@@ -70,7 +70,7 @@ export class AppComponent {
         case 'DB_IN_PROGRESS':
           break;
         default:
-          this.toastrService.warning(`Comportement inattendu, dictionnaire non disponible`);
+          this.toastrService.warning(`Comportement inattendu, dictionnaire non disponible (${data})`);
       }
     };
 

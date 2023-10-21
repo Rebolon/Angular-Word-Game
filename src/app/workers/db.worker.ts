@@ -1,9 +1,9 @@
 /// <reference lib="webworker" />
 
-import { Observable, from, map, switchMap, tap, toArray } from 'rxjs';
+import { Observable, bufferCount, from, map, mergeMap, scan, switchMap, tap, toArray } from 'rxjs';
 import { ajax } from "rxjs/internal/ajax/ajax";
 import { Lang, Word, db } from '../services/database/db';
-import {AjaxResponse} from "rxjs/internal/ajax/AjaxResponse";
+import { AjaxResponse } from "rxjs/internal/ajax/AjaxResponse";
 
 /* */
 addEventListener('message', ({ data }) => {
@@ -32,7 +32,11 @@ function populate(): Observable<unknown> {
     }),
     toArray(),
     tap(() => postMessage(`DB_IN_PROGRESS`)),
-    switchMap((words) => from(db.words.bulkAdd(words)))
+    /*bufferCount(50, 2),
+    mergeMap((words) => from(db.words.bulkAdd(words[0]))),*/
+    mergeMap((words) => from(db.words.bulkAdd(words))),
+    /*scan((acc, value, index) => acc + value, 0),
+    tap((value) => postMessage(`insert ${value}`)),*/
   )
 }
 /* */

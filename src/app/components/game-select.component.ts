@@ -14,6 +14,8 @@ import { ReactiveFormsModule } from '@angular/forms';
       (ngSubmit)="selectGame()">
       <select
             formControlName="game"
+            name="game"
+            title="game"
           >
         <option value="-1">Choix du mode de jeu</option>
         <option *ngFor="let gameKey of form.getGamesKeys()" [ngValue]="gameKey">
