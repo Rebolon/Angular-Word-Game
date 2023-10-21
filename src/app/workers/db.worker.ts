@@ -8,8 +8,8 @@ import {AjaxResponse} from "rxjs/internal/ajax/AjaxResponse";
 /* */
 addEventListener('message', ({ data }) => {
   populate().subscribe({
-    complete: () => postMessage(`INFO worker complete db insert`),
-    error: (err) => postMessage(`ERROR from db worker ${err}`)
+    complete: () => postMessage(`DB_POPULATED`),
+    error: (err) => postMessage(`ERROR: ${err}`)
   })
 });
 
@@ -31,7 +31,7 @@ function populate(): Observable<unknown> {
       } as Word
     }),
     toArray(),
-    tap(() => postMessage(`INFO worker inserting data`)),
+    tap(() => postMessage(`DB_IN_PROGRESS`)),
     switchMap((words) => from(db.words.bulkAdd(words)))
   )
 }

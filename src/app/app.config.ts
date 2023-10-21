@@ -6,7 +6,10 @@ import { provideServiceWorker } from '@angular/service-worker';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),
-    provideToastr(),
+    provideToastr({
+      positionClass: 'toast-bottom-full-width',
+      preventDuplicates: true,
+    }),
     provideServiceWorker('ngsw-worker.js', {
         enabled: !isDevMode(),
         registrationStrategy: 'registerWhenStable:30000'

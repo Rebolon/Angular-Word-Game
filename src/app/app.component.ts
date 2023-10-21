@@ -46,7 +46,9 @@ export class AppComponent {
       next: (count: number) => {
         if (count === 0) {
           this.loadDb();
-          toastrService.info('Loading database');
+          toastrService.info('Chargement du dictionnaire');
+        } else {
+          toastrService.success('Dictionnaire chargé');
         }
       },
       error: (err) => {
@@ -61,12 +63,21 @@ export class AppComponent {
       { name: 'initDb', type: 'module' });
 
     worker.onmessage = ({ data }) => {
-      this.toastrService.info(`Page got message from worker: ${data}`);
+      switch (data) {
+        case 'DB_POPULATED':
+          this.toastrService.success(`Dictionnaire chargé`);
+          break;
+        case 'DB_IN_PROGRESS':
+          break;
+        default:
+          this.toastrService.warning(`Comportement inattendu, dictionnaire non disponible`);
+      }
     };
 
     worker.postMessage('init-db');
   }
-  onSelected(game: any) {
+
+  protected onSelected(game: any) {
     switch (game) {
       case GameType.Alphabet:
         this.game = new Alphabet();
