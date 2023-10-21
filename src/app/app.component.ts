@@ -10,6 +10,7 @@ import {AlphabetGame, GameType} from './services/word-game.interface';
 import {liveQuery} from 'dexie';
 import {db, Word} from './services/database/db';
 import {filter, from, take, timeout} from 'rxjs';
+import { Toast, ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'my-app',
@@ -36,29 +37,35 @@ export class AppComponent {
   protected game!: AlphabetGame;
 
   // @odo should i use from or not ? it will depends if i need to use dexie feature
-  dictionnary$ = from(liveQuery(() => db.words.where('value').equalsIgnoreCase('reva').toArray()));
+  dictionnary$ = from(liveQuery(() => db.words.where('value').equalsIgnoreCase('reva').count()));
 
-  constructor() {
+  constructor(private toastrService: ToastrService) {
     this.dictionnary$.pipe(
-      timeout(1000),
-      filter((words: Word[]): words is Word[] => words && !!words.length),
       take(1)
     ).subscribe({
-      next: (words: Word[]) => console.log('y a des mots ?', words),
+      next: (count: number) => {
+        if (count === 0) {
+          this.loadDb();
+          toastrService.info('Loading database');
+        }
+      },
       error: (err) => {
-        const worker = new Worker(
-          new URL('./workers/db.worker', import.meta.url),
-          // Those options are mandatory to build worker :
-          { name: 'initDb', type: 'module' });
-
-        worker.onmessage = ({ data }) => {
-          console.log(`page got message from worker: ${data}`);
-        };
-
-        worker.postMessage('init-db');
+        this.loadDb();
     }});
   }
 
+  private loadDb() : void {
+    const worker = new Worker(
+      new URL('./workers/db.worker', import.meta.url),
+      // Those options are mandatory to build worker :
+      { name: 'initDb', type: 'module' });
+
+    worker.onmessage = ({ data }) => {
+      this.toastrService.info(`Page got message from worker: ${data}`);
+    };
+
+    worker.postMessage('init-db');
+  }
   onSelected(game: any) {
     switch (game) {
       case GameType.Alphabet:

@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { Observable, from, map, switchMap, toArray } from 'rxjs';
+import { Observable, from, map, switchMap, tap, toArray } from 'rxjs';
 import { ajax } from "rxjs/internal/ajax/ajax";
 import { Lang, Word, db } from '../services/database/db';
 import {AjaxResponse} from "rxjs/internal/ajax/AjaxResponse";
@@ -8,9 +8,6 @@ import {AjaxResponse} from "rxjs/internal/ajax/AjaxResponse";
 /* */
 addEventListener('message', ({ data }) => {
   populate().subscribe({
-    next: (promiseResult) => {
-      postMessage(`INFO worker inserting data`);
-    },
     complete: () => postMessage(`INFO worker complete db insert`),
     error: (err) => postMessage(`ERROR from db worker ${err}`)
   })
@@ -34,6 +31,7 @@ function populate(): Observable<unknown> {
       } as Word
     }),
     toArray(),
+    tap(() => postMessage(`INFO worker inserting data`)),
     switchMap((words) => from(db.words.bulkAdd(words)))
   )
 }
