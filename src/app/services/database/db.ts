@@ -18,17 +18,6 @@ export class DictionaryDB extends Dexie {
       this.version(3).stores({
         words: '++,fr,value',
       });
-      this.on('populate', () => this.populate());
-    }
-  
-    // @todo this should be done by a SharedWorker and only if there is no value in DB for the current lang (fr for instance)
-    async populate() {
-      /*await db.words.bulkAdd([
-        {
-          value: 'Feed the birds',
-          lang: Lang.FR
-        },
-      ]);*/
     }
   }
   
