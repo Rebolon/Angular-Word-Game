@@ -25,7 +25,7 @@ addEventListener('message', ({ data }) => {
 });
 
 const response$: Observable<AjaxResponse<string>> = ajax({
-  url: 'http://localhost:4200/assets/dictionnaries/fr/ods6.txt',
+  url: '/assets/dictionnaries/fr/ods6.txt',
   headers: {
     "Accept": "text"
   },
