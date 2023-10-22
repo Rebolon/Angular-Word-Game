@@ -1,42 +1,67 @@
 /// <reference lib="webworker" />
 
-import { Observable, bufferCount, from, map, mergeMap, scan, switchMap, tap, toArray } from 'rxjs';
+import { Observable, buffer, bufferCount, combineLatestWith, count, distinct, from, map, merge, mergeAll, mergeMap, of, scan, share, switchMap, take, tap, toArray, zip, zipWith } from 'rxjs';
 import { ajax } from "rxjs/internal/ajax/ajax";
 import { Lang, Word, db } from '../services/database/db';
 import { AjaxResponse } from "rxjs/internal/ajax/AjaxResponse";
+import {liveQuery} from 'dexie';
 
 /* */
 addEventListener('message', ({ data }) => {
-  populate().subscribe({
+  zip(databaseCount$, dictionnayCount$).pipe(
+    tap(([databaseCount, dictionnaryCount]) => console.log(databaseCount, dictionnaryCount)),
+    switchMap(([databaseCount, dictionnaryCount]) => {
+      if (databaseCount === dictionnaryCount) {
+        return populate$;
+      } 
+      return of(databaseCount)
+    })
+  )
+  .subscribe({
+    next: (value) => postMessage(`DB_IN_PROGRESS ${value}`),
     complete: () => postMessage(`DB_POPULATED`),
     error: (err) => postMessage(`ERROR: ${err}`)
   })
 });
 
-function populate(): Observable<unknown> {
-  const response$: Observable<AjaxResponse<string>> = ajax({
-    url: 'http://localhost:4200/assets/dictionnaries/fr/ods6.txt',
-    headers: {
-      "Accept": "text"
-    },
-    responseType: "text"
-  });
-
-  return response$.pipe(
-    switchMap(dic => from(dic.response.split(/\n/))),
-    map(word => {
-      return {
-        lang: Lang.FR,
-        value: word
-      } as Word
-    }),
-    toArray(),
-    tap(() => postMessage(`DB_IN_PROGRESS`)),
-    /*bufferCount(50, 2),
-    mergeMap((words) => from(db.words.bulkAdd(words[0]))),*/
-    mergeMap((words) => from(db.words.bulkAdd(words))),
-    /*scan((acc, value, index) => acc + value, 0),
-    tap((value) => postMessage(`insert ${value}`)),*/
+const response$: Observable<AjaxResponse<string>> = ajax({
+  url: 'http://localhost:4200/assets/dictionnaries/fr/ods6.txt',
+  headers: {
+    "Accept": "text"
+  },
+  responseType: "text"
+});
+const databaseCount$ = liveQuery(() => db.words.count());
+const wordsInDictionnary$: Observable<Word> = response$.pipe(
+  switchMap(dic => from(dic.response.split(/\n/))),
+  distinct(),
+  map((word) => {
+    return {
+      lang: Lang.FR,
+      value: word
+    } as Word
+  }),
+  share(),
+);
+const dictionnayCount$: Observable<number> = wordsInDictionnary$.pipe(
+  count()
+);
+const populate$: Observable<unknown> =
+  /* Beuh j'ai plein de toast Chargement de donnée ... Why ?*/
+  wordsInDictionnary$.pipe(
+    tap(() => postMessage(`DB_START_POPULATE`)),
+    bufferCount(50),
+    mergeMap((words) => from(db.words.bulkAdd(words))
+      .pipe(
+        tap(count => console.log('count', count))
+      )
+    ),
+    /*tap(totalInserted => console.log(totalInserted)),
+    mergeMap((totalInserted) => dictionnayCount$
+      .pipe(
+        map((total) => totalInserted / total * 100),
+        tap(percent => console.log('percent', percent))
+      )
+    )*/
   )
-}
 /* */

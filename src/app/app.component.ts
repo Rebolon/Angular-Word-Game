@@ -36,24 +36,8 @@ export class AppComponent {
   protected defaultGame = GameType.Alphabet
   protected game!: AlphabetGame;
 
-  // @odo should i use from or not ? it will depends if i need to use dexie feature
-  dictionnary$ = from(liveQuery(() => db.words.where('value').equalsIgnoreCase('reva').count()));
-
   constructor(private toastrService: ToastrService) {
-    this.dictionnary$.pipe(
-      take(1)
-    ).subscribe({
-      next: (count: number) => {
-        if (count === 0) {
-          this.loadDb();
-          toastrService.info('Chargement du dictionnaire');
-        } else {
-          toastrService.success('Dictionnaire chargé');
-        }
-      },
-      error: (err) => {
-        this.loadDb();
-    }});
+    this.loadDb();
   }
 
   private loadDb() : void {
@@ -63,11 +47,16 @@ export class AppComponent {
       { name: 'initDb', type: 'module' });
 
     worker.onmessage = ({ data }) => {
-      switch (data) {
+      const splitData = data.split(' ');
+      switch (splitData[0]) {
+        case 'DB_START_POPULATE':
+          this.toastrService.info('Chargement du dictionnaire');
+          break;
         case 'DB_POPULATED':
           this.toastrService.success(`Dictionnaire chargé`);
           break;
         case 'DB_IN_PROGRESS':
+          this.toastrService.success(`Chargement ${splitData[1]}`);
           break;
         default:
           this.toastrService.warning(`Comportement inattendu, dictionnaire non disponible (${data})`);

@@ -18,6 +18,11 @@ export class DictionaryDB extends Dexie {
       this.version(3).stores({
         words: '++,fr,value',
       });
+      this.on('populate', () => this.populate());
+    }
+
+    populate() {
+      console.log('populate')
     }
   }
   
