@@ -1,21 +1,42 @@
 /// <reference lib="webworker" />
 
-import { Observable, buffer, bufferCount, combineLatestWith, count, distinct, from, map, merge, mergeAll, mergeMap, of, scan, share, switchMap, take, tap, toArray, zip, zipWith } from 'rxjs';
+import { Observable, bufferCount, combineLatestWith, count, distinct, from, map, mergeMap, of, share, switchMap, take, tap } from 'rxjs';
 import { ajax } from "rxjs/internal/ajax/ajax";
-import { Lang, Word, db } from '../services/database/db';
 import { AjaxResponse } from "rxjs/internal/ajax/AjaxResponse";
-import {liveQuery} from 'dexie';
+import { liveQuery } from 'dexie';
+import { Lang, Word, db } from '../services/database/db';
 
 /* */
 addEventListener('message', ({ data }) => {
-  zip(databaseCount$, dictionnayCount$).pipe(
-    tap(([databaseCount, dictionnaryCount]) => console.log(databaseCount, dictionnaryCount)),
+  if (data !== 'init-db') {
+    return postMessage('ERROR: LOGIC_ERROR');
+  }
+
+  // first one is to load Data
+  dictionnayCount$.pipe(
+    combineLatestWith(databaseCount$),
+    take(1), // to force stop , but i should use another iterator instead of combineLatestWith to prevent the usage of take(1)
+    tap(([databaseCount, dictionnaryCount]) => console.log('combineLatestWith', databaseCount, dictionnaryCount)),
     switchMap(([databaseCount, dictionnaryCount]) => {
-      if (databaseCount === dictionnaryCount) {
+      // Won't it be called more than once ? yes it will :-( until they are different, it will call populate$ again and again
+      // need to find another way but it's better
+      if (databaseCount !== dictionnaryCount) {
         return populate$;
       } 
       return of(databaseCount)
     })
+  )
+  .subscribe({
+    next: (value) => postMessage(`DB_IN_PROGRESS ${value}`),
+    complete: () => postMessage(`DB_POPULATED`),
+    error: (err) => postMessage(`ERROR: ${err}`)
+  })
+
+  // second to calculate ratio
+  dictionnayCount$.pipe(
+    combineLatestWith(databaseCount$),
+    tap(([databaseCount, dictionnaryCount]) => console.log('combineLatestWith', databaseCount, dictionnaryCount)),
+    map(([databaseCount, dictionnaryCount]) => databaseCount / dictionnaryCount * 100)
   )
   .subscribe({
     next: (value) => postMessage(`DB_IN_PROGRESS ${value}`),

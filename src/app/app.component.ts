@@ -7,10 +7,7 @@ import {TitleComponent} from './components/title.component';
 import {TitleSelectedGameComponent} from './components/title-selected-game.component';
 import {GameSelectComponent} from './components/game-select.component';
 import {AlphabetGame, GameType} from './services/word-game.interface';
-import {liveQuery} from 'dexie';
-import {db, Word} from './services/database/db';
-import {filter, from, take, timeout} from 'rxjs';
-import { Toast, ToastrService } from 'ngx-toastr';
+import {ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'my-app',
@@ -42,9 +39,8 @@ export class AppComponent {
 
   private loadDb() : void {
     const worker = new Worker(
-      new URL('./workers/db.worker', import.meta.url),
-      // Those options are mandatory to build worker :
-      { name: 'initDb', type: 'module' });
+      new URL('./workers/db.worker', import.meta.url)
+    );
 
     worker.onmessage = ({ data }) => {
       const splitData = data.split(' ');
