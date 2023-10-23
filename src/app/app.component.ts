@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {GridComponent} from './components/grid.component';
 import {Boggle} from './services/boggle/boggle.service';
@@ -12,7 +12,7 @@ import {ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'my-app',
   standalone: true,
-  imports: [CommonModule, TitleComponent, TitleSelectedGameComponent, GridComponent, GameSelectComponent, NgOptimizedImage],
+  imports: [CommonModule, TitleComponent, TitleSelectedGameComponent, GridComponent, GameSelectComponent, NgOptimizedImage, ],
   providers: [Alphabet, Boggle],
   template: `
     <header>
@@ -29,11 +29,13 @@ import {ToastrService } from 'ngx-toastr';
     </footer>
   `,
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   protected defaultGame = GameType.Alphabet
   protected game!: AlphabetGame;
 
-  constructor(private toastrService: ToastrService) {
+  constructor(private toastrService: ToastrService) {}
+
+  ngOnInit(): void {
     this.loadDb();
   }
 
@@ -48,11 +50,17 @@ export class AppComponent {
         case 'DB_START_POPULATE':
           this.toastrService.info('Chargement du dictionnaire');
           break;
+        case 'DB_IN_PROGRESS':
+          this.toastrService.info(`Chargement ${splitData[1]}`);
+          break;
         case 'DB_POPULATED':
           this.toastrService.success(`Dictionnaire chargé`);
           break;
-        case 'DB_IN_PROGRESS':
-          this.toastrService.success(`Chargement ${splitData[1]}`);
+        case 'INFO':
+          console.info('In component, info received from worker', data)
+          break;
+        case 'ERROR':
+          console.warn('In component, error received from worker', data)
           break;
         default:
           this.toastrService.warning(`Comportement inattendu, dictionnaire non disponible (${data})`);

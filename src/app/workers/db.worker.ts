@@ -7,10 +7,16 @@ import { liveQuery } from 'dexie';
 import { Lang, Word, db } from '../services/database/db';
 
 /* */
+let counter = 0;
+
 addEventListener('message', ({ data }) => {
   if (data !== 'init-db') {
-    return postMessage('ERROR: LOGIC_ERROR');
+    return postMessage('ERROR LOGIC_ERROR');
   }
+
+  counter++
+  postMessage(`INFO MESSAGE RECEIVED ${counter}`);
+  console.info('DEBUG WORKER message received', counter);
 
   // first one is to load Data
   dictionnayCount$.pipe(
@@ -23,24 +29,22 @@ addEventListener('message', ({ data }) => {
       if (databaseCount !== dictionnaryCount) {
         return populate$;
       } 
-      return of(databaseCount)
+      return of(100)
     })
   )
   .subscribe({
-    next: (value) => postMessage(`DB_IN_PROGRESS ${value}`),
     complete: () => postMessage(`DB_POPULATED`),
-    error: (err) => postMessage(`ERROR: ${err}`)
+    error: (err) => postMessage(`ERROR ${err}`)
   })
 
   // second to calculate ratio
   dictionnayCount$.pipe(
     combineLatestWith(databaseCount$),
     tap(([databaseCount, dictionnaryCount]) => console.log('combineLatestWith', databaseCount, dictionnaryCount)),
-    map(([databaseCount, dictionnaryCount]) => databaseCount / dictionnaryCount * 100)
+    map(([databaseCount, dictionnaryCount]) => databaseCount ? databaseCount / dictionnaryCount * 100 : 0)
   )
   .subscribe({
     next: (value) => postMessage(`DB_IN_PROGRESS ${value}`),
-    complete: () => postMessage(`DB_POPULATED`),
     error: (err) => postMessage(`ERROR: ${err}`)
   })
 });
