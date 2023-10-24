@@ -1,0 +1,4 @@
+export enum MESSAGES_REQUEST {
+    GET_COUNTERS,
+    INIT_DB,
+}

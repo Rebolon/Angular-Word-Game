@@ -7,7 +7,9 @@ import {TitleComponent} from './components/title.component';
 import {TitleSelectedGameComponent} from './components/title-selected-game.component';
 import {GameSelectComponent} from './components/game-select.component';
 import {AlphabetGame, GameType} from './services/word-game.interface';
+import { MESSAGES_REQUEST } from './services/database/messages-request'
 import {ToastrService } from 'ngx-toastr';
+import { MESSAGES_RESPONSE } from './services/database/messages-response';
 
 @Component({
   selector: 'my-app',
@@ -40,6 +42,7 @@ export class AppComponent implements OnInit {
   }
 
   private loadDb() : void {
+    let progress = 0;
     const worker = new Worker(
       new URL('./workers/db.worker', import.meta.url)
     );
@@ -47,19 +50,23 @@ export class AppComponent implements OnInit {
     worker.onmessage = ({ data }) => {
       const splitData = data.split(' ');
       switch (splitData[0]) {
-        case 'DB_START_POPULATE':
+        case MESSAGES_RESPONSE.DB_START_POPULATE.toString():
           this.toastrService.info('Chargement du dictionnaire');
           break;
-        case 'DB_IN_PROGRESS':
-          this.toastrService.info(`Chargement ${splitData[1]}`);
+        case MESSAGES_RESPONSE.DB_IN_PROGRESS.toString():
+          if (progress === 0 && splitData[1] === "100") {
+            return;
+          }
+          this.toastrService.info(`Chargement ${splitData[1]}%`, undefined, {timeOut: 1000});
+          progress++
           break;
-        case 'DB_POPULATED':
+        case MESSAGES_RESPONSE.DB_POPULATED.toString():
           this.toastrService.success(`Dictionnaire chargé`);
           break;
-        case 'INFO':
+        case MESSAGES_RESPONSE.INFO.toString():
           console.info('In component, info received from worker', data)
           break;
-        case 'ERROR':
+        case MESSAGES_RESPONSE.ERROR.toString():
           console.warn('In component, error received from worker', data)
           break;
         default:
@@ -67,7 +74,7 @@ export class AppComponent implements OnInit {
       }
     };
 
-    worker.postMessage('init-db');
+    worker.postMessage(MESSAGES_REQUEST.INIT_DB);
   }
 
   protected onSelected(game: any) {
