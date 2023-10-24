@@ -54,9 +54,9 @@ export class AppComponent implements OnInit {
           this.toastrService.info('Chargement du dictionnaire');
           break;
         case MESSAGES_RESPONSE.DB_IN_PROGRESS.toString():
-          if (progress === 0 && splitData[1] === "100") {
+          /*if (progress === 0 && splitData[1] === "100") {
             return;
-          }
+          }*/
           this.toastrService.info(`Chargement ${splitData[1]}%`, undefined, {timeOut: 1000});
           progress++
           break;

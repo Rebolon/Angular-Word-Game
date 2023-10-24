@@ -32,8 +32,9 @@ export class GameBehavior implements GameBehaviorI {
     // Puis on subscribe à la query sur IndexedDb et 
     // Si ça marche on fait la tambouille d'ajout du mot et du clean
     // Si ça marche pas on fait rien et on renvoi juste une erreur qui sera utilisé par le composant
-    const currentWord = this.selectedCases.length ?
-        this.selectedCases
+    const selectedCases = Array.from(this.selectedCases)
+    const currentWord = selectedCases.length ?
+        selectedCases
           .reverse()
           .map((boardCase: BoardCase) => boardCase.value.value)
           .reduce((boardCaseValue, accumulator = "") => `${accumulator}${boardCaseValue}`) : '';
