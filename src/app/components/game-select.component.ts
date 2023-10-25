@@ -1,13 +1,15 @@
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { GameType, GameType2LabelMapping } from '../services/word-game.interface';
-import { NgFor } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { GameType } from '../services/word-game.interface';
+import { AsyncPipe, NgFor } from '@angular/common';
 import { GameSelectorForm } from '../game.form';
 import { ReactiveFormsModule } from '@angular/forms';
+import { DbService } from '../services/database/db.service';
+import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'my-game-select',
   standalone: true,
-  imports: [NgFor, ReactiveFormsModule],
+  imports: [NgFor, AsyncPipe, ReactiveFormsModule],
   template: `
     <form 
       [formGroup]="form"
@@ -23,7 +25,7 @@ import { ReactiveFormsModule } from '@angular/forms';
         </option>
       </select>
 
-      <button type="submit">Jouer</button>
+      <button type="submit" [disabled]="dbIsLoading() | async">Jouer</button>
     </form>
   `,
   styleUrls: ['./game-select.scss'],
@@ -33,11 +35,20 @@ export class GameSelectComponent {
   @Output('selected') game: EventEmitter<GameType> = new EventEmitter();
   protected form: GameSelectorForm = new GameSelectorForm();
 
+  constructor(protected dbService: DbService) {
+  }
+
   selectGame(): void {
     if (this.form.invalid) {
       return;
     }
     
     this.game.emit(this.form.value.game)
+  }
+
+  protected dbIsLoading(): Observable<boolean> {
+    return this.dbService.progress$.pipe(
+      map((progress: number) => progress < 100),
+    )
   }
 }

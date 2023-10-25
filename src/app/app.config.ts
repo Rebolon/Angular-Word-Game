@@ -9,7 +9,7 @@ export const appConfig: ApplicationConfig = {
     provideToastr({
       positionClass: 'toast-bottom-full-width',
       preventDuplicates: true,
-      maxOpened: 2,
+      maxOpened: 1,
     }),
     provideServiceWorker('ngsw-worker.js', {
         enabled: !isDevMode(),
