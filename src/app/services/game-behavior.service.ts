@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, from, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, from, map, of, switchMap, tap } from 'rxjs';
 import { Lang, db } from './database/db';
 import { BoardCase, BoardConfig, Coordinates, GameBehavior as GameBehaviorI } from './word-game.interface';
 import { liveQuery } from 'dexie';
@@ -23,7 +23,7 @@ export class GameBehavior implements GameBehaviorI {
     this.stopped = true;
   }
 
-  validateWord(): void {
+  validateWord(): Observable<boolean> {
     // @todo le pb ici est que l'on inject le mot dans le Subject, qu'il est lu par le stream du constructeur, mais que la partie 
     // query sur l'IndexedDb est asynchrone, ce qui place la demande dans l'eventLoop et on reprend l'execution du code ici
     // et on repart dans la Query quand elle a répondu
@@ -40,23 +40,25 @@ export class GameBehavior implements GameBehaviorI {
           .reduce((boardCaseValue, accumulator = "") => `${accumulator}${boardCaseValue}`) : '';
 
     if (this.isAlreadyExistingWord(currentWord)) {
-      throw new Error("Already existing word");
+      throw new Error("Le mot existe déjà");
     }
 
-    if (this.hasMinimalLenght(currentWord)) {
-      throw new Error("Minimal lenght not reached : 3 chars");
+    if (!this.hasMinimalLenght(currentWord)) {
+      throw new Error("Longueur minimum de 3 caractères");
     }
 
-    this.isRealWord(currentWord).subscribe({
-      next: (isRealWord: boolean) => {
+    return this.isRealWord(currentWord).pipe(
+      tap((isRealWord: boolean) => {
         if (isRealWord) {
           this.words.push(currentWord);
           this.cancelSelectedWord();
+
+          return of(isRealWord)
         } else {
-          throw new Error("Unknown word in dictionnary");
+          throw new Error("Mot inconnu dans le dictionnaire");
         }
-      }
-    })
+      })
+    )
   }
 
   cancelSelectedWord(): void {
@@ -142,8 +144,7 @@ export class GameBehavior implements GameBehaviorI {
   }
 
   private hasMinimalLenght(currentWord: string): boolean {
-    console.log('hasMinimalLenght', currentWord)
-    return currentWord.length < 3;
+    return currentWord.length > 2;
   }
 
   private isRealWord(currentWord: string): Observable<boolean> {

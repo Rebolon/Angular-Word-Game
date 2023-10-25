@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { Observable, bufferCount, combineLatestWith, count, distinct, from, map, mergeMap, of, share, switchMap, take, tap } from 'rxjs';
+import { Observable, bufferCount, combineLatestWith, count, distinct, filter, from, map, mergeMap, of, share, switchMap, take, tap } from 'rxjs';
 import { ajax } from "rxjs/internal/ajax/ajax";
 import { AjaxResponse } from "rxjs/internal/ajax/AjaxResponse";
 import { liveQuery } from 'dexie';
@@ -15,18 +15,28 @@ const allowedMessages = [
 ];
 
 addEventListener('message', ({ data }) => {
-  if (!allowedMessages.find((value) => value === data)) {
-    return postMessage(`${MESSAGES_RESPONSE.ERROR} LOGIC_ERROR`);
+  if (allowedMessages.find((value) => value === data) === undefined) {
+    return postMessage(`${MESSAGES_RESPONSE.ERROR} LOGIC_ERROR: ${data}`);
   }
 
   // always calculate ratio and send info to main thread
   dictionnayCount$.pipe(
     combineLatestWith(databaseCount$),
-    map(([databaseCount, dictionnaryCount]) => databaseCount ? databaseCount / dictionnaryCount * 100 : 0)
   )
   .subscribe({
     next: (value) => {
-      postMessage(`${MESSAGES_RESPONSE.DB_IN_PROGRESS} ${value}`)
+      postMessage(`${MESSAGES_RESPONSE.DB_COUNTERS} ${value[1]} ${value[0]}`)
+    },
+    error: (err) => postMessage(`${MESSAGES_RESPONSE.ERROR} ${err}`)
+  })
+
+  dictionnayCount$.pipe(
+    combineLatestWith(databaseCount$),
+    map(([dictionnaryCount, databaseCount]) => calculatePercentage(dictionnaryCount, databaseCount))
+  )
+  .subscribe({
+    next: (value) => {
+      postMessage(`${MESSAGES_RESPONSE.DB_IN_PROGRESS} ${value} %`)
     },
     error: (err) => postMessage(`${MESSAGES_RESPONSE.ERROR} ${err}`)
   })
@@ -36,13 +46,14 @@ addEventListener('message', ({ data }) => {
     dictionnayCount$.pipe(
       combineLatestWith(databaseCount$),
       take(1), // to force stop , but i should use another iterator instead of combineLatestWith to prevent the usage of take(1)
-      tap(([databaseCount, dictionnaryCount]) => console.log('combineLatestWith', databaseCount, dictionnaryCount)),
-      switchMap(([databaseCount, dictionnaryCount]) => {
+      switchMap(([dictionnaryCount, databaseCount]) => {
         // Won't it be called more than once ? yes it will :-( until they are different, it will call populate$ again and again
         // need to find another way but it's better
-        if (databaseCount !== dictionnaryCount) {
+        if (databaseCount < dictionnaryCount) {
           postMessage(`${MESSAGES_RESPONSE.DB_START_POPULATE}`);
-          return populate$;
+          return populate$(databaseCount).pipe(
+            tap((progress) => postMessage(`${MESSAGES_RESPONSE.DB_IN_PROGRESS} ${progress} mots`))
+          );
         } 
         return of(100)
       })
@@ -76,12 +87,12 @@ const wordsInDictionnary$: Observable<Word> = response$.pipe(
 const dictionnayCount$: Observable<number> = wordsInDictionnary$.pipe(
   count()
 );
-const populate$: Observable<number> =
-  wordsInDictionnary$.pipe(
+const populate$ = (startIndex = 0): Observable<number> => {
+  return wordsInDictionnary$.pipe(
+    filter((value, index) => index >= startIndex),
     bufferCount(50000),
-    mergeMap((words) => from(db.words.bulkAdd(words))
-      .pipe(
-        tap(count => console.log('count', count))
-      )
-    )
+    mergeMap((words) => from(db.words.bulkAdd(words))),
+    tap(count => console.log('count', count))
   );
+}
+const calculatePercentage = (dictionnaryCount: number, databaseCount: number) => databaseCount ? (databaseCount / dictionnaryCount * 100).toFixed(0) : 0

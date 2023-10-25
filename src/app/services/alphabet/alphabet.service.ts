@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { AlphabetGame, Game, BoardConfig, CaseValue, BoardCase, CaseStatus, Coordinates, GameType } from '../word-game.interface';
 import { GameBehavior } from '../game-behavior.service';
 import { AlphabetScoring } from './alphabet-scoring.service';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class Alphabet implements AlphabetGame {
-  readonly gameType: GameType = GameType.Alphabet;
   private readonly alphabet: CaseValue[] = [];
-  private currentGame!: Game;
+  private currentGame: Subject<Game> = new Subject;
+  public readonly currentGame$: Observable<Game> = this.currentGame.asObservable();
+  readonly gameType: GameType = GameType.Alphabet;
 
   constructor() {
     [...Array(26)].map((_, i) =>
@@ -17,10 +19,11 @@ export class Alphabet implements AlphabetGame {
     );
   }
 
-  prepare(): Game {
+  prepare(): void {
+    /*
     if (this.currentGame) {
       return this.currentGame;
-    }
+    }*/
 
     const grid = this.getGrid();
     let values: BoardCase[][] = [];
@@ -40,13 +43,13 @@ export class Alphabet implements AlphabetGame {
       values[row] = rowValues;
     }
 
-    this.currentGame = {
+    const currentGame = {
       boardConfig: grid,
       gameBehavior: new GameBehavior(grid, values),
       scoring: new AlphabetScoring()
     }
 
-    return this.currentGame;
+    this.currentGame.next(currentGame);
   }
 
   private getRandomLetter(): CaseValue {
