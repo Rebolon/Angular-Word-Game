@@ -1,3 +1,5 @@
+import { Observable } from "rxjs";
+
 export interface Game {
   readonly boardConfig: BoardConfig;
   readonly gameBehavior: GameBehavior; // @todo remove this from Game it should be a service thta interact with component
@@ -27,7 +29,7 @@ export interface GameBehavior {
   readonly gridCases: BoardCase[][]
   stop(): void
   isStopped(): boolean
-  validateWord(): void
+  validateWord(): Observable<boolean>
   cancelSelectedWord(): void
   canSelectCase(boardCase: BoardCase): boolean
   canUnSelectCase(boardCase: BoardCase): boolean
