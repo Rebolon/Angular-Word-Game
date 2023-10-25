@@ -9,13 +9,10 @@ export const appConfig: ApplicationConfig = {
     provideToastr({
       positionClass: 'toast-bottom-full-width',
       preventDuplicates: true,
+      maxOpened: 1,
     }),
     provideServiceWorker('ngsw-worker.js', {
         enabled: !isDevMode(),
         registrationStrategy: 'registerWhenStable:30000'
-    }), 
-    provideServiceWorker('db-worker.js', {
-      enabled: !isDevMode(),
-      registrationStrategy: 'registerWhenStable:30000'
-  })]
+    }), ]
 };

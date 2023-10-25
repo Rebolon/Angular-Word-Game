@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, from, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, from, map, of, switchMap, tap } from 'rxjs';
 import { Lang, db } from './database/db';
 import { BoardCase, BoardConfig, Coordinates, GameBehavior as GameBehaviorI } from './word-game.interface';
 import { liveQuery } from 'dexie';
@@ -23,7 +23,7 @@ export class GameBehavior implements GameBehaviorI {
     this.stopped = true;
   }
 
-  validateWord(): void {
+  validateWord(): Observable<boolean> {
     // @todo le pb ici est que l'on inject le mot dans le Subject, qu'il est lu par le stream du constructeur, mais que la partie 
     // query sur l'IndexedDb est asynchrone, ce qui place la demande dans l'eventLoop et on reprend l'execution du code ici
     // et on repart dans la Query quand elle a répondu
@@ -32,8 +32,9 @@ export class GameBehavior implements GameBehaviorI {
     // Puis on subscribe à la query sur IndexedDb et 
     // Si ça marche on fait la tambouille d'ajout du mot et du clean
     // Si ça marche pas on fait rien et on renvoi juste une erreur qui sera utilisé par le composant
-    const currentWord = this.selectedCases.length ?
-        this.selectedCases
+    const selectedCases = Array.from(this.selectedCases)
+    const currentWord = selectedCases.length ?
+        selectedCases
           .reverse()
           .map((boardCase: BoardCase) => boardCase.value.value)
           .reduce((boardCaseValue, accumulator = "") => `${accumulator}${boardCaseValue}`) : '';
@@ -46,16 +47,18 @@ export class GameBehavior implements GameBehaviorI {
       throw new Error("Minimal lenght not reached : 3 chars");
     }
 
-    this.isRealWord(currentWord).subscribe({
-      next: (isRealWord: boolean) => {
+    return this.isRealWord(currentWord).pipe(
+      tap((isRealWord: boolean) => {
         if (isRealWord) {
           this.words.push(currentWord);
           this.cancelSelectedWord();
+
+          return of(isRealWord)
         } else {
           throw new Error("Unknown word in dictionnary");
         }
-      }
-    })
+      })
+    )
   }
 
   cancelSelectedWord(): void {

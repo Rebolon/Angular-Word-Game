@@ -56,7 +56,9 @@ export class GridComponent implements OnChanges {
 
   protected validateWord(): void {
     try {
-      this.board.gameBehavior.validateWord();
+      this.board.gameBehavior.validateWord().subscribe({
+        error: (err) => this.toastrService.warning(`Ce n'est pas un mot du dictionnaire`)
+      });
     } catch (e) {
       this.toastrService.warning(`Ce n'est pas un mot du dictionnaire`);
     }

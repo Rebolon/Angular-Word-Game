@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {GridComponent} from './components/grid.component';
 import {Boggle} from './services/boggle/boggle.service';
@@ -7,15 +7,14 @@ import {TitleComponent} from './components/title.component';
 import {TitleSelectedGameComponent} from './components/title-selected-game.component';
 import {GameSelectComponent} from './components/game-select.component';
 import {AlphabetGame, GameType} from './services/word-game.interface';
-import {liveQuery} from 'dexie';
-import {db, Word} from './services/database/db';
-import {filter, from, take, timeout} from 'rxjs';
-import { Toast, ToastrService } from 'ngx-toastr';
+import {ToastrService } from 'ngx-toastr';
+import { MESSAGES_RESPONSE } from './services/database/messages-response';
+import { DbService } from './services/database/db.service';
 
 @Component({
   selector: 'my-app',
   standalone: true,
-  imports: [CommonModule, TitleComponent, TitleSelectedGameComponent, GridComponent, GameSelectComponent, NgOptimizedImage],
+  imports: [CommonModule, TitleComponent, TitleSelectedGameComponent, GridComponent, GameSelectComponent, NgOptimizedImage, ],
   providers: [Alphabet, Boggle],
   template: `
     <header>
@@ -32,49 +31,34 @@ import { Toast, ToastrService } from 'ngx-toastr';
     </footer>
   `,
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   protected defaultGame = GameType.Alphabet
   protected game!: AlphabetGame;
 
-  // @odo should i use from or not ? it will depends if i need to use dexie feature
-  dictionnary$ = from(liveQuery(() => db.words.where('value').equalsIgnoreCase('reva').count()));
+  constructor(private toastrService: ToastrService, private dbService: DbService) {}
 
-  constructor(private toastrService: ToastrService) {
-    this.dictionnary$.pipe(
-      take(1)
-    ).subscribe({
-      next: (count: number) => {
-        if (count === 0) {
-          this.loadDb();
-          toastrService.info('Chargement du dictionnaire');
-        } else {
-          toastrService.success('Dictionnaire chargé');
+  ngOnInit(): void {
+    this.dbService.workerMessages$.subscribe(
+      (workerMessage) => {
+        switch (workerMessage.message) {
+          case MESSAGES_RESPONSE.DB_START_POPULATE:
+          case MESSAGES_RESPONSE.DB_POPULATED:
+            this.toastrService[workerMessage.type](workerMessage.detail);
+            break;
+          case MESSAGES_RESPONSE.DB_IN_PROGRESS:
+            this.toastrService[workerMessage.type](workerMessage.detail, undefined, {timeOut: 1000});
+            break;
+          case MESSAGES_RESPONSE.INFO:
+            console.info(workerMessage.detail)
+            break;
+          case MESSAGES_RESPONSE.ERROR:
+            console.warn(workerMessage.detail)
+            break;
+          default:
+            this.toastrService[workerMessage.type](workerMessage.detail);
         }
-      },
-      error: (err) => {
-        this.loadDb();
-    }});
-  }
-
-  private loadDb() : void {
-    const worker = new Worker(
-      new URL('./workers/db.worker', import.meta.url),
-      // Those options are mandatory to build worker :
-      { name: 'initDb', type: 'module' });
-
-    worker.onmessage = ({ data }) => {
-      switch (data) {
-        case 'DB_POPULATED':
-          this.toastrService.success(`Dictionnaire chargé`);
-          break;
-        case 'DB_IN_PROGRESS':
-          break;
-        default:
-          this.toastrService.warning(`Comportement inattendu, dictionnaire non disponible`);
       }
-    };
-
-    worker.postMessage('init-db');
+    );
   }
 
   protected onSelected(game: any) {

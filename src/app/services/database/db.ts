@@ -10,6 +10,7 @@ export interface Word {
     value: string;
 }
 
+// @todo improve by using a composite key instead of auto-increment
 export class DictionaryDB extends Dexie {
     words!: Table<Word, number>;
   
@@ -18,6 +19,11 @@ export class DictionaryDB extends Dexie {
       this.version(3).stores({
         words: '++,fr,value',
       });
+      this.on('populate', () => this.populate());
+    }
+
+    populate() {
+      console.log('populate')
     }
   }
   
