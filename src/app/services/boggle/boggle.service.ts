@@ -2,15 +2,17 @@ import { Injectable } from '@angular/core';
 import { AlphabetGame, BoardCase, BoardConfig, CaseStatus, CaseValue, Game, GameType } from '../word-game.interface';
 import { GameBehavior } from '../game-behavior.service';
 import { BoggleScoring } from './boggle-scoring.service';
+import { Observable, Subject, of } from 'rxjs';
 
 @Injectable()
 export class Boggle implements AlphabetGame {
-  readonly gameType: GameType = GameType.Boggle;
   private readonly alphabet: CaseValue[][] = [];
   private alphabetDices: CaseValue[][] = [];
-  private currentGame!: Game;
+  private currentGame: Subject<Game> = new Subject;
+  public readonly currentGame$: Observable<Game> = this.currentGame.asObservable();
+  readonly gameType: GameType = GameType.Boggle;
 
-  constructor() {
+  private init() {
     const letters = [
       ['E', 'T', 'U', 'K', 'N', 'O'],
       ['E', 'V', 'G', 'T', 'I', 'N'],
@@ -44,11 +46,15 @@ export class Boggle implements AlphabetGame {
     this.alphabetDices = structuredClone(this.alphabet);
   }
 
-  prepare(): Game {
+  prepare(): void {
+    /*
     if (this.currentGame) {
       return this.currentGame;
     }
+    */
 
+    this.init();
+    
     const grid = this.getGrid();
     let values: BoardCase[][] = []
 
@@ -67,13 +73,13 @@ export class Boggle implements AlphabetGame {
       values[row] = rowValues;
     }
 
-    this.currentGame = {
+    const currentGame = {
       boardConfig: grid,
       gameBehavior: new GameBehavior(grid, values),
       scoring: new BoggleScoring()
     }
 
-    return this.currentGame;
+    this.currentGame.next(currentGame);
   }
 
   private getRandomLetter(): CaseValue {

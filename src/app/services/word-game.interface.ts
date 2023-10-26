@@ -74,8 +74,9 @@ export const GameType2LabelMapping: Record<GameType, string> = {
 
 export interface AlphabetGame {
   readonly gameType: GameType;
+  readonly currentGame$: Observable<Game>;
 
-  prepare(): Game;
+  prepare(): void;
 }
 
 export interface GameScoring {

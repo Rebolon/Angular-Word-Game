@@ -33,13 +33,14 @@ import { ToastrService } from 'ngx-toastr';
 export class GridComponent implements OnChanges {
   @Input({ required: true }) game!: AlphabetGame;
   protected board!: Game;
-  protected countDown = signal(120)
+  protected countDown = signal(120);
   
   constructor (private toastrService: ToastrService) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
     const game = changes['game'].currentValue as unknown as AlphabetGame;
-    this.board = game.prepare();
+    game.currentGame$.subscribe((currentGame) => this.board = currentGame)
+    game.prepare();
   }
 
   protected getRows(): Array<BoardCase> {
@@ -57,10 +58,10 @@ export class GridComponent implements OnChanges {
   protected validateWord(): void {
     try {
       this.board.gameBehavior.validateWord().subscribe({
-        error: (err) => this.toastrService.warning(`Ce n'est pas un mot du dictionnaire`)
+        error: (err) => this.toastrService.warning(err)
       });
     } catch (e) {
-      this.toastrService.warning(`Ce n'est pas un mot du dictionnaire`);
+      this.toastrService.warning((e as Error).message);
     }
   }
 
@@ -73,7 +74,7 @@ export class GridComponent implements OnChanges {
   }
 
   protected restart(): void {
-    this.board = this.game.prepare();
+    this.game.prepare();
     this.countDown.set(120)
   }
 }

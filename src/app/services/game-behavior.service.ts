@@ -40,11 +40,11 @@ export class GameBehavior implements GameBehaviorI {
           .reduce((boardCaseValue, accumulator = "") => `${accumulator}${boardCaseValue}`) : '';
 
     if (this.isAlreadyExistingWord(currentWord)) {
-      throw new Error("Already existing word");
+      throw new Error("Le mot existe déjà");
     }
 
-    if (this.hasMinimalLenght(currentWord)) {
-      throw new Error("Minimal lenght not reached : 3 chars");
+    if (!this.hasMinimalLenght(currentWord)) {
+      throw new Error("Longueur minimum de 3 caractères");
     }
 
     return this.isRealWord(currentWord).pipe(
@@ -55,7 +55,7 @@ export class GameBehavior implements GameBehaviorI {
 
           return of(isRealWord)
         } else {
-          throw new Error("Unknown word in dictionnary");
+          throw new Error("Mot inconnu dans le dictionnaire");
         }
       })
     )
@@ -144,8 +144,7 @@ export class GameBehavior implements GameBehaviorI {
   }
 
   private hasMinimalLenght(currentWord: string): boolean {
-    console.log('hasMinimalLenght', currentWord)
-    return currentWord.length < 3;
+    return currentWord.length > 2;
   }
 
   private isRealWord(currentWord: string): Observable<boolean> {

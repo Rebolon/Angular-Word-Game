@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AsyncPipe, NgClass, NgIf } from '@angular/common';
-import { delay, interval, map, startWith, takeWhile, tap } from 'rxjs';
+import { delay, filter, interval, map, startWith, takeWhile, tap } from 'rxjs';
 
 @Component({
   selector: 'my-countdown',
@@ -15,14 +15,15 @@ export class CountDownComponent {
   @Input({ required: true }) starTime!: number;
   @Input() endText: string = "Partie finie";
   @Output() timeEnded: EventEmitter<true> = new EventEmitter();
-  protected time$ = interval(1000).pipe(  
+  protected time$ = interval(1000).pipe(
+    //tap((value) => console.info('countdown', value)),
     map((value: number) => this.starTime - value),
     tap((value: number) => {
       if (value === 0) {
         this.timeEnded.emit(true);
       }
     }),
-    takeWhile((value: number) => value >= 0),
+    filter((value: number) => value >= 0),
     map((time: number) => {
       const h = Math.floor(time / 3600);
       const m = Math.floor(time % 3600 / 60);
@@ -37,6 +38,6 @@ export class CountDownComponent {
   );
   protected displayCounter$ = this.time$.pipe(
     map(value => value != "00:00"), 
-    delay(1000)
+    //delay(1000)
     );
 }

@@ -46,7 +46,6 @@ addEventListener('message', ({ data }) => {
     dictionnayCount$.pipe(
       combineLatestWith(databaseCount$),
       take(1), // to force stop , but i should use another iterator instead of combineLatestWith to prevent the usage of take(1)
-      tap(([dictionnaryCount, databaseCount]) => console.log('combineLatestWith', databaseCount, dictionnaryCount)),
       switchMap(([dictionnaryCount, databaseCount]) => {
         // Won't it be called more than once ? yes it will :-( until they are different, it will call populate$ again and again
         // need to find another way but it's better
