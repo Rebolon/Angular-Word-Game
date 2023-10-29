@@ -30,6 +30,7 @@ import { DbService } from './services/database/db.service';
     <footer>
     </footer>
   `,
+  styleUrls: ['./app.scss',]
 })
 export class AppComponent implements OnInit {
   protected defaultGame = GameType.Alphabet

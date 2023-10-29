@@ -9,10 +9,22 @@ body {
     min-height: 100vh;
 }
 
-main, header, footer {
-    text-align: center;
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 5px;
+my-app {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+button {
+    background: none;
+    border: 2px solid;
+    font: inherit;
+    line-height: 1;
+    margin: 0.5em;
+    //padding: 1em 2em;
+  }
+
+  
+.raise:hover,
+.raise:focus {
+  box-shadow: 0 0.5em 0.5em -0.4em var(--hover);
+  transform: translateY(-0.25em);
 }
