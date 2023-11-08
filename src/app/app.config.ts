@@ -7,12 +7,14 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),
     provideToastr({
-      positionClass: 'toast-bottom-full-width',
-      preventDuplicates: true,
-      maxOpened: 1,
+        positionClass: 'toast-bottom-full-width',
+        preventDuplicates: true,
+        maxOpened: 1,
     }),
     provideServiceWorker('ngsw-worker.js', {
         enabled: !isDevMode(),
         registrationStrategy: 'registerWhenStable:30000'
-    }), ]
+    }),
+    provideAnimations()
+]
 };

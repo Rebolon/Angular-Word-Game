@@ -5,27 +5,31 @@ import { GameSelectorForm } from '../game.form';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DbService } from '../services/database/db.service';
 import { Observable, map } from 'rxjs';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+
 
 @Component({
   selector: 'my-game-select',
   standalone: true,
-  imports: [NgFor, AsyncPipe, ReactiveFormsModule],
+  imports: [NgFor, AsyncPipe, ReactiveFormsModule, MatSelectModule, MatButtonModule],
   template: `
     <form 
       [formGroup]="form"
       (ngSubmit)="selectGame()">
-      <select
+      <mat-form-field>
+        <mat-label>Choix du mode de jeu</mat-label>
+        <mat-select 
             formControlName="game"
             name="game"
-            title="game"
-          >
-        <option value="-1">Choix du mode de jeu</option>
-        <option *ngFor="let gameKey of form.getGamesKeys()" [ngValue]="gameKey">
+            title="game">
+          <mat-option *ngFor="let gameKey of form.getGamesKeys()" [value]="gameKey">
           {{ form.getGameValue(gameKey) }}
-        </option>
-      </select>
-
-      <button type="submit" [disabled]="dbIsLoading() | async">Jouer</button>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <br />
+      <button mat-raised-button type="submit" [disabled]="dbIsLoading() | async">Jouer</button>
     </form>
   `,
   styleUrls: ['./game-select.scss'],

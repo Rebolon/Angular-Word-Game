@@ -5,24 +5,38 @@ import { LetterComponent } from './letter.component';
 import { WordsComponent } from './words.component';
 import { CountDownComponent } from './countdown.component';
 import { ScoreComponent } from './score.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { ToastrService } from 'ngx-toastr';
+import { TitleSelectedGameComponent } from './title-selected-game.component';
 
 @Component({
   selector: 'my-grid',
   standalone: true,
-  imports: [NgFor, NgIf, LetterComponent, WordsComponent, CountDownComponent, ScoreComponent, ],
+  imports: [NgFor, NgIf, TitleSelectedGameComponent, LetterComponent, WordsComponent, CountDownComponent, ScoreComponent, MatButtonModule, MatGridListModule, ],
   template: `
   <ng-container *ngIf="board">
-    <my-countdown [starTime]="countDown()" (timeEnded)="stopGame()"/>
-    <my-score *ngIf="board.gameBehavior.isStopped()" [gameScoring]="board.scoring" [words]="board.gameBehavior.getWords()"></my-score>
-    <div *ngFor="let row of board.gameBehavior.gridCases" class="flex-container">
-      <my-letter *ngFor="let col of row" [case]="col" [behavior]="board.gameBehavior"></my-letter>
-    </div>
+    <mat-grid-list [cols]="3" rowHeight="2:1">
+      <mat-grid-tile><my-title-selected-game [game]="game" /></mat-grid-tile>
+      <mat-grid-tile>
+        <my-countdown *ngIf="countDownIsStarted() && !countDownIsEnded()" [starTime]="countDown()" (ended)="stopGame()" (started)="startGame()"/>
+        <h2 *ngIf="!countDownIsStarted() && countDownIsEnded()">Partie finie</h2>
+      </mat-grid-tile>
+      <mat-grid-tile><my-score *ngIf="board.gameBehavior.isStopped()" [gameScoring]="board.scoring" [words]="board.gameBehavior.getWords()"></my-score></mat-grid-tile>
+    </mat-grid-list>
 
-    <button (click)="validateWord()" [disabled]="board.gameBehavior.isStopped()">Ajouter le mot</button>
-    <button (click)="cancelWord()" [disabled]="board.gameBehavior.isStopped()">Annuler</button>
+    <mat-grid-list [cols]="board.boardConfig.cols" rowHeight="1:1" gutterSize="10px">
+      <ng-container *ngFor="let row of board.gameBehavior.gridCases">
+        <mat-grid-tile *ngFor="let col of row">
+          <my-letter [case]="col" [behavior]="board.gameBehavior"></my-letter>
+        </mat-grid-tile>
+      </ng-container>
+    </mat-grid-list>
+
+    <button mat-raised-button color="primary" (click)="validateWord()" [disabled]="board.gameBehavior.isStopped()">Ajouter le mot</button>
+    <button mat-raised-button color="accent" (click)="cancelWord()" [disabled]="board.gameBehavior.isStopped()">Annuler</button>
     <ng-container *ngIf="board.gameBehavior.isStopped()">
-      <button (click)="restart()">Rejouer</button>
+      <button mat-raised-button color="primary" (click)="restart()">Rejouer</button>
     </ng-container>
 
     <my-words [board]="board" />
@@ -33,14 +47,16 @@ import { ToastrService } from 'ngx-toastr';
 export class GridComponent implements OnChanges {
   @Input({ required: true }) game!: AlphabetGame;
   protected board!: Game;
-  protected countDown = signal(120);
+  protected countDown = signal(0);
+  protected countDownIsStarted = signal(false);
+  protected countDownIsEnded = signal(false);
   
   constructor (private toastrService: ToastrService) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
     const game = changes['game'].currentValue as unknown as AlphabetGame;
     game.currentGame$.subscribe((currentGame) => this.board = currentGame)
-    game.prepare();
+    this.restart()
   }
 
   protected getRows(): Array<BoardCase> {
@@ -71,10 +87,18 @@ export class GridComponent implements OnChanges {
 
   protected stopGame(): void {
     this.board.gameBehavior.stop();
+    this.countDownIsEnded.set(true);
+    this.countDownIsStarted.set(false);
+  }
+
+  protected startGame(): void {
+    this.countDownIsStarted.set(true);
   }
 
   protected restart(): void {
     this.game.prepare();
-    this.countDown.set(120)
+    this.countDown.set(5)
+    this.countDownIsEnded.set(false);
+    this.countDownIsStarted.set(true);
   }
 }

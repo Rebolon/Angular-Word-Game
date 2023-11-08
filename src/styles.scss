@@ -1,4 +1,4 @@
-body {
+/*body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     margin: 0;
@@ -7,24 +7,26 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-}
+}*/
 
 my-app {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-button {
+/*button {
     background: none;
     border: 2px solid;
     font: inherit;
     line-height: 1;
     margin: 0.5em;
     //padding: 1em 2em;
-  }
+  }*/
 
   
-.raise:hover,
+/*.raise:hover,
 .raise:focus {
   box-shadow: 0 0.5em 0.5em -0.4em var(--hover);
   transform: translateY(-0.25em);
-}
+}*/
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
