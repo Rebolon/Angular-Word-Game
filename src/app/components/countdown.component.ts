@@ -1,27 +1,40 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { AsyncPipe, NgClass, NgIf } from '@angular/common';
-import { delay, filter, interval, map, share, startWith, takeWhile, tap } from 'rxjs';
+import { ReplaySubject, Subject, combineLatestWith, filter, finalize, interval, map, scan, share, takeWhile, tap } from 'rxjs';
 
 @Component({
   selector: 'my-countdown',
   standalone: true,
   imports: [NgClass, NgIf, AsyncPipe],
   template: `
-    <h2 *ngIf="(displayCounter$ | async) === true">{{time$ | async}}</h2>
-    <h2 *ngIf="(displayCounter$ | async) === false">{{endText}}</h2>
+    <h2>{{time$ | async}}</h2>
   `,
 })
-export class CountDownComponent {
-  @Input({ required: true }) starTime!: number;
-  @Input() endText: string = "Partie finie";
-  @Output() timeEnded: EventEmitter<true> = new EventEmitter();
-  protected time$ = interval(1000).pipe(
-    startWith(0),
-    map((value: number) => this.starTime - value),
-    filter((value: number) => value >= 0),
+export class CountDownComponent implements OnChanges, OnInit {
+  @Input({ required: true }) starTime!: number | null;
+  @Output() started: EventEmitter<true> = new EventEmitter();
+  @Output() ended: EventEmitter<true> = new EventEmitter();
+
+  private startTime$: Subject<number> = new ReplaySubject(1);
+  private myInterval = this.startTime$.pipe(
+    tap((value) => console.log(this.constructor.name, "01", value, new Date())),
+    combineLatestWith(interval(1000)),
+    tap((value) => {
+      if (value[1] === 0) {
+        this.started.emit(true);
+      }
+    }),
+    tap((value) => console.log(this.constructor.name, "02", value, new Date())),
+    takeWhile((value) => value[1] <= value[0]),
+    share(),
+  );
+  protected time$ = this.myInterval.pipe(
+    tap((value) => console.log(this.constructor.name, 1, value, new Date())),
+    map((value) => value[0] - value[1]),
+    tap((value) => console.log(this.constructor.name, 2, value, new Date())),
     tap((value: number) => {
       if (value === 0) {
-        this.timeEnded.emit(true);
+        this.ended.emit(true);
       }
     }),
     map((time: number) => {
@@ -35,10 +48,21 @@ export class CountDownComponent {
 
       return `${hDisplay}${mDisplay}${sDisplay}`;
     }),
+    tap((value) => console.log(this.constructor.name, 3, value, new Date())),
+    finalize(() => console.warn('finally')),
     share()
   );
-  protected displayCounter$ = this.time$.pipe(
-    map(value => value != "00:00"), 
-    delay(1000)
-    );
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['starTime']) {
+      this.startTime$.next(changes['starTime'].currentValue as number)
+    }
+  }
+
+  ngOnInit(): void {
+    this.startTime$.subscribe({
+      next: (value) => console.info('onInit next', value),
+      complete: () => console.warn('startTime$ complete')
+    })
+  }
 }

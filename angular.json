@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Angular-Word-Game": {
+    "angular-word-game": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -80,10 +80,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "Angular-Word-Game:build:production"
+              "buildTarget": "angular-word-game:build:production"
             },
             "development": {
-              "browserTarget": "Angular-Word-Game:build:development"
+              "buildTarget": "angular-word-game:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -91,7 +91,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "Angular-Word-Game:build"
+            "buildTarget": "angular-word-game:build"
           }
         },
         "test": {
