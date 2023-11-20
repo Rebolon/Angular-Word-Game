@@ -50,7 +50,7 @@ export class GridComponent implements OnChanges {
   protected countDown = signal(0);
   protected countDownIsStarted = signal(false);
   protected countDownIsEnded = signal(false);
-  
+
   constructor (private toastrService: ToastrService) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -97,7 +97,7 @@ export class GridComponent implements OnChanges {
 
   protected restart(): void {
     this.game.prepare();
-    this.countDown.set(5)
+    this.countDown.set(120)
     this.countDownIsEnded.set(false);
     this.countDownIsStarted.set(true);
   }

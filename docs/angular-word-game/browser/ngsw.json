@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1700513664306,
+  "timestamp": 1700514224441,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -11,14 +11,12 @@
         "ignoreVary": true
       },
       "urls": [
-        "/337.e8e6f1394f6773c5.js",
         "/favicon.ico",
-        "/index.html",
-        "/main.33ff0697eb6af9ba.js",
+        "/main-QLDWTECN.js",
         "/manifest.webmanifest",
-        "/polyfills.5dcd70726c6cbbb9.js",
-        "/runtime.e26d468d87bc804b.js",
-        "/styles.afac9918ddd03d33.css"
+        "/polyfills-LZBJRJJE.js",
+        "/styles-YGVZOL2I.css",
+        "/worker-3HU4WHEN.js"
       ],
       "patterns": []
     },
@@ -30,7 +28,6 @@
         "ignoreVary": true
       },
       "urls": [
-        "/3rdpartylicenses.txt",
         "/assets/dictionnaries/en/able.txt",
         "/assets/dictionnaries/en/sowpods.txt",
         "/assets/dictionnaries/fr/gutemberg.txt",
@@ -49,8 +46,6 @@
   ],
   "dataGroups": [],
   "hashTable": {
-    "/337.e8e6f1394f6773c5.js": "c7a6fbd19eac7014b2ee2b4af47eece46d776064",
-    "/3rdpartylicenses.txt": "41ca6f61fca325a1ff6b36e0e15460745ab31051",
     "/assets/dictionnaries/en/able.txt": "5657bd45ec00688ddeb7e50204573888971ea6d7",
     "/assets/dictionnaries/en/sowpods.txt": "6e6ac1ac90d28a48d2dccca9c399f54d4973430f",
     "/assets/dictionnaries/fr/gutemberg.txt": "8906d64ac64b3113f4018e8c204ea27f257baeac",
@@ -64,12 +59,11 @@
     "/assets/icons/icon-72x72.png": "279825a1ac4377032ae996a1832c641e33ccf1b6",
     "/assets/icons/icon-96x96.png": "592885efcbfee27e5e20be4fa3043589390d2740",
     "/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "/index.html": "3ee8509a061ef51b5abcc526be906b47feddcd56",
-    "/main.33ff0697eb6af9ba.js": "d2d146752b537f82752ed63d37da3cce5a36241e",
+    "/main-QLDWTECN.js": "b2e6fe368816e51538214f7c038d73a5f947bb15",
     "/manifest.webmanifest": "1952b76276cafd1c35a1ce79488112cda2c84cc7",
-    "/polyfills.5dcd70726c6cbbb9.js": "8f84f2a14aa5fe2dc471fe32157bf0cd53ba6d99",
-    "/runtime.e26d468d87bc804b.js": "aa3cc4f4b9701788b3ea2735c61982a311c428ca",
-    "/styles.afac9918ddd03d33.css": "4acca9d8b182486fc4a56366259ed575d642adb8"
+    "/polyfills-LZBJRJJE.js": "fda1c82c5c620f1fa442f687b3df45a037f6fcc9",
+    "/styles-YGVZOL2I.css": "d4cd9177365ecdcb6a36c7633433d98b7b3c4289",
+    "/worker-3HU4WHEN.js": "b5cbacc17db8053c03cbcd74bc0803f4b2b504a0"
   },
   "navigationUrls": [
     {
