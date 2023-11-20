@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { GameType } from '../services/word-game.interface';
-import { AsyncPipe, NgFor } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { GameSelectorForm } from '../game.form';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DbService } from '../services/database/db.service';
@@ -12,20 +12,22 @@ import { MatButtonModule } from '@angular/material/button';
 @Component({
   selector: 'my-game-select',
   standalone: true,
-  imports: [NgFor, AsyncPipe, ReactiveFormsModule, MatSelectModule, MatButtonModule],
+  imports: [AsyncPipe, ReactiveFormsModule, MatSelectModule, MatButtonModule],
   template: `
-    <form 
+    <form
       [formGroup]="form"
       (ngSubmit)="selectGame()">
       <mat-form-field>
         <mat-label>Choix du mode de jeu</mat-label>
-        <mat-select 
+        <mat-select
             formControlName="game"
             name="game"
             title="game">
-          <mat-option *ngFor="let gameKey of form.getGamesKeys()" [value]="gameKey">
+          @for (gameKey of form.getGamesKeys(); track gameKey) {
+          <mat-option [value]="gameKey">
           {{ form.getGameValue(gameKey) }}
           </mat-option>
+          }
         </mat-select>
       </mat-form-field>
       <br />
@@ -46,7 +48,7 @@ export class GameSelectComponent {
     if (this.form.invalid) {
       return;
     }
-    
+
     this.game.emit(this.form.value.game)
   }
 

@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { AsyncPipe, NgClass, NgIf } from '@angular/common';
-import { ReplaySubject, Subject, combineLatestWith, filter, finalize, interval, map, scan, share, takeWhile, tap } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
+import { ReplaySubject, Subject, combineLatestWith, finalize, interval, map, share, takeWhile, tap } from 'rxjs';
 
 @Component({
   selector: 'my-countdown',
   standalone: true,
-  imports: [NgClass, NgIf, AsyncPipe],
+  imports: [AsyncPipe],
   template: `
     <h2>{{time$ | async}}</h2>
   `,

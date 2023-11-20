@@ -1,4 +1,3 @@
-import { NgFor, NgIf } from '@angular/common';
 import { Component, Input, OnChanges, SimpleChanges, signal } from '@angular/core';
 import { AlphabetGame, BoardCase, Game } from '../services/word-game.interface';
 import { LetterComponent } from './letter.component';
@@ -13,34 +12,44 @@ import { TitleSelectedGameComponent } from './title-selected-game.component';
 @Component({
   selector: 'my-grid',
   standalone: true,
-  imports: [NgFor, NgIf, TitleSelectedGameComponent, LetterComponent, WordsComponent, CountDownComponent, ScoreComponent, MatButtonModule, MatGridListModule, ],
+  imports: [TitleSelectedGameComponent, LetterComponent, WordsComponent, CountDownComponent, ScoreComponent, MatButtonModule, MatGridListModule, ],
   template: `
-  <ng-container *ngIf="board">
+  @if ("board") {
     <mat-grid-list [cols]="3" rowHeight="2:1">
       <mat-grid-tile><my-title-selected-game [game]="game" /></mat-grid-tile>
       <mat-grid-tile>
-        <my-countdown *ngIf="countDownIsStarted() && !countDownIsEnded()" [starTime]="countDown()" (ended)="stopGame()" (started)="startGame()"/>
-        <h2 *ngIf="!countDownIsStarted() && countDownIsEnded()">Partie finie</h2>
+        @if (countDownIsStarted() && !countDownIsEnded()) {
+        <my-countdown [starTime]="countDown()" (ended)="stopGame()" (started)="startGame()"/>
+        }
+        @if (!countDownIsStarted() && countDownIsEnded()) {
+        <h2>Partie finie</h2>
+        }
       </mat-grid-tile>
-      <mat-grid-tile><my-score *ngIf="board.gameBehavior.isStopped()" [gameScoring]="board.scoring" [words]="board.gameBehavior.getWords()"></my-score></mat-grid-tile>
-    </mat-grid-list>
-
-    <mat-grid-list [cols]="board.boardConfig.cols" rowHeight="1:1" gutterSize="10px">
-      <ng-container *ngFor="let row of board.gameBehavior.gridCases">
-        <mat-grid-tile *ngFor="let col of row">
-          <my-letter [case]="col" [behavior]="board.gameBehavior"></my-letter>
-        </mat-grid-tile>
-      </ng-container>
+      <mat-grid-tile>
+      @if (board.gameBehavior.isStopped()) {
+        <my-score [gameScoring]="board.scoring" [words]="board.gameBehavior.getWords()"></my-score>
+      }
+      </mat-grid-tile>
     </mat-grid-list>
 
     <button mat-raised-button color="primary" (click)="validateWord()" [disabled]="board.gameBehavior.isStopped()">Ajouter le mot</button>
     <button mat-raised-button color="accent" (click)="cancelWord()" [disabled]="board.gameBehavior.isStopped()">Annuler</button>
-    <ng-container *ngIf="board.gameBehavior.isStopped()">
+    @if (board.gameBehavior.isStopped()) {
       <button mat-raised-button color="primary" (click)="restart()">Rejouer</button>
-    </ng-container>
+    }
+
+    <mat-grid-list [cols]="board.boardConfig.cols" rowHeight="1:1" gutterSize="10px">
+      @for (row of board.gameBehavior.gridCases; track row) {
+        @for (col of row; track col) {
+        <mat-grid-tile>
+          <my-letter [case]="col" [behavior]="board.gameBehavior"></my-letter>
+        </mat-grid-tile>
+        }
+      }
+    </mat-grid-list>
 
     <my-words [board]="board" />
-  </ng-container>
+  }
   `,
   styleUrls: ['./grid.scss'],
 })

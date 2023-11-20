@@ -13,17 +13,18 @@ import { DbService } from './services/database/db.service';
 @Component({
   selector: 'my-app',
   standalone: true,
-  imports: [CommonModule, TitleComponent, GridComponent, GameSelectComponent, NgOptimizedImage, ],
+  imports: [CommonModule, TitleComponent, GridComponent, GameSelectComponent, ],
   providers: [Alphabet, Boggle],
   template: `
     <header>
       <my-title/>
     </header>
     <main>
-      <my-game-select *ngIf="!game" [selected]="defaultGame" (selected)="onSelected($event)" />
-      <ng-container *ngIf="game">
+      @if (game) {
         <my-grid [game]="game" />
-      </ng-container>
+      } @else {
+        <my-game-select  [selected]="defaultGame" (selected)="onSelected($event)" />
+      }
     </main>
     <footer>
     </footer>

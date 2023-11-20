@@ -5,13 +5,15 @@ import { Game } from '../services/word-game.interface';
 @Component({
   selector: 'my-words',
   standalone: true,
-  imports: [NgFor, NgIf],
+  imports: [],
   template: `
-  <ng-container *ngIf="hasValidateWords()">
-    <ul *ngFor="let word of getWords()" class="flex-container">
+  @if (hasValidateWords()) {
+    <ul class="flex-container">
+      @for (word of getWords(); track word) {
       <li>{{word}}</li>
+      }
     </ul>
-  </ng-container>
+  }
   `,
   styleUrls: ['./grid.scss'],
 })
