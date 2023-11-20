@@ -24,11 +24,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "docs/angular-word-game",
             "index": "src/index.html",
-            "main": "src/main.ts",
+            "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -45,9 +45,8 @@
               "src/styles.scss"
             ],
             "scripts": [],
-            "serviceWorker": true,
-            "webWorkerTsConfig": "tsconfig.worker.json",
-            "ngswConfigPath": "ngsw-config.json"
+            "serviceWorker": "ngsw-config.json",
+            "webWorkerTsConfig": "tsconfig.worker.json"
           },
           "configurations": {
             "production": {
@@ -66,9 +65,7 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
@@ -120,6 +117,9 @@
     }
   },
   "cli": {
-    "analytics": true
+    "analytics": true,
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   }
 }

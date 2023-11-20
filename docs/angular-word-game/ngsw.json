@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1698611436859,
+  "timestamp": 1700513664306,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -14,11 +14,11 @@
         "/337.e8e6f1394f6773c5.js",
         "/favicon.ico",
         "/index.html",
-        "/main.1e2f2e81a8c290ab.js",
+        "/main.33ff0697eb6af9ba.js",
         "/manifest.webmanifest",
-        "/polyfills.0cfd3b166dcb31f3.js",
-        "/runtime.6e2fc6db5b036d82.js",
-        "/styles.6a046edec6f52473.css"
+        "/polyfills.5dcd70726c6cbbb9.js",
+        "/runtime.e26d468d87bc804b.js",
+        "/styles.afac9918ddd03d33.css"
       ],
       "patterns": []
     },
@@ -50,7 +50,7 @@
   "dataGroups": [],
   "hashTable": {
     "/337.e8e6f1394f6773c5.js": "c7a6fbd19eac7014b2ee2b4af47eece46d776064",
-    "/3rdpartylicenses.txt": "34fa2c1874ab3c92102fed28ec1c67963a8055c7",
+    "/3rdpartylicenses.txt": "41ca6f61fca325a1ff6b36e0e15460745ab31051",
     "/assets/dictionnaries/en/able.txt": "5657bd45ec00688ddeb7e50204573888971ea6d7",
     "/assets/dictionnaries/en/sowpods.txt": "6e6ac1ac90d28a48d2dccca9c399f54d4973430f",
     "/assets/dictionnaries/fr/gutemberg.txt": "8906d64ac64b3113f4018e8c204ea27f257baeac",
@@ -64,12 +64,12 @@
     "/assets/icons/icon-72x72.png": "279825a1ac4377032ae996a1832c641e33ccf1b6",
     "/assets/icons/icon-96x96.png": "592885efcbfee27e5e20be4fa3043589390d2740",
     "/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "/index.html": "6ba9e4150addab48d05200cb7232772096304b4a",
-    "/main.1e2f2e81a8c290ab.js": "c808d19c50c9057bea9c7f53bab86617d7eb2b99",
+    "/index.html": "3ee8509a061ef51b5abcc526be906b47feddcd56",
+    "/main.33ff0697eb6af9ba.js": "d2d146752b537f82752ed63d37da3cce5a36241e",
     "/manifest.webmanifest": "1952b76276cafd1c35a1ce79488112cda2c84cc7",
-    "/polyfills.0cfd3b166dcb31f3.js": "af3742e1d6ee8d74312f451be4cd09daf37a7604",
-    "/runtime.6e2fc6db5b036d82.js": "b7d65d3564ef56620cca3eb54ef22d0fd025bf4d",
-    "/styles.6a046edec6f52473.css": "05a46ce945128fceeb73ccb6a396c253e7c88265"
+    "/polyfills.5dcd70726c6cbbb9.js": "8f84f2a14aa5fe2dc471fe32157bf0cd53ba6d99",
+    "/runtime.e26d468d87bc804b.js": "aa3cc4f4b9701788b3ea2735c61982a311c428ca",
+    "/styles.afac9918ddd03d33.css": "4acca9d8b182486fc4a56366259ed575d642adb8"
   },
   "navigationUrls": [
     {
