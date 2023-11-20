@@ -4,7 +4,6 @@ import {GridComponent} from './components/grid.component';
 import {Boggle} from './services/boggle/boggle.service';
 import {Alphabet} from './services/alphabet/alphabet.service';
 import {TitleComponent} from './components/title.component';
-import {TitleSelectedGameComponent} from './components/title-selected-game.component';
 import {GameSelectComponent} from './components/game-select.component';
 import {AlphabetGame, GameType} from './services/word-game.interface';
 import {ToastrService } from 'ngx-toastr';
@@ -14,7 +13,7 @@ import { DbService } from './services/database/db.service';
 @Component({
   selector: 'my-app',
   standalone: true,
-  imports: [CommonModule, TitleComponent, TitleSelectedGameComponent, GridComponent, GameSelectComponent, NgOptimizedImage, ],
+  imports: [CommonModule, TitleComponent, GridComponent, GameSelectComponent, NgOptimizedImage, ],
   providers: [Alphabet, Boggle],
   template: `
     <header>
@@ -23,7 +22,6 @@ import { DbService } from './services/database/db.service';
     <main>
       <my-game-select *ngIf="!game" [selected]="defaultGame" (selected)="onSelected($event)" />
       <ng-container *ngIf="game">
-        <my-title-selected-game [game]="game" />
         <my-grid [game]="game" />
       </ng-container>
     </main>
