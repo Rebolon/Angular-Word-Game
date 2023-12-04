@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1700515760118,
+  "timestamp": 1701723649773,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -12,7 +12,7 @@
       },
       "urls": [
         "/favicon.ico",
-        "/main-NZESTTY2.js",
+        "/main-INZFHQL6.js",
         "/manifest.webmanifest",
         "/polyfills-LZBJRJJE.js",
         "/styles-YGVZOL2I.css",
@@ -59,7 +59,7 @@
     "/assets/icons/icon-72x72.png": "279825a1ac4377032ae996a1832c641e33ccf1b6",
     "/assets/icons/icon-96x96.png": "592885efcbfee27e5e20be4fa3043589390d2740",
     "/favicon.ico": "22f6a4a3bcaafafb0254e0f2fa4ceb89e505e8b2",
-    "/main-NZESTTY2.js": "15c66061ab47c4357ff7d689d16ab7ce61222d84",
+    "/main-INZFHQL6.js": "9f1bf35eb97c83dc56f04a8dc8d4bbb46414748a",
     "/manifest.webmanifest": "1952b76276cafd1c35a1ce79488112cda2c84cc7",
     "/polyfills-LZBJRJJE.js": "fda1c82c5c620f1fa442f687b3df45a037f6fcc9",
     "/styles-YGVZOL2I.css": "d4cd9177365ecdcb6a36c7633433d98b7b3c4289",

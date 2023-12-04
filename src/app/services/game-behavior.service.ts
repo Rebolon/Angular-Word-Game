@@ -24,12 +24,12 @@ export class GameBehavior implements GameBehaviorI {
   }
 
   validateWord(): Observable<boolean> {
-    // @todo le pb ici est que l'on inject le mot dans le Subject, qu'il est lu par le stream du constructeur, mais que la partie 
+    // @todo le pb ici est que l'on inject le mot dans le Subject, qu'il est lu par le stream du constructeur, mais que la partie
     // query sur l'IndexedDb est asynchrone, ce qui place la demande dans l'eventLoop et on reprend l'execution du code ici
     // et on repart dans la Query quand elle a répondu
     // => pour corriger ça on peut supprimer le currentWordInSeries$ qui sert à rien
     // On execute les premiers checks
-    // Puis on subscribe à la query sur IndexedDb et 
+    // Puis on subscribe à la query sur IndexedDb et
     // Si ça marche on fait la tambouille d'ajout du mot et du clean
     // Si ça marche pas on fait rien et on renvoi juste une erreur qui sera utilisé par le composant
     const selectedCases = Array.from(this.selectedCases)
@@ -95,7 +95,7 @@ export class GameBehavior implements GameBehaviorI {
     if (this.isStopped()) {
       return false;
     }
-    
+
     if (!this.isInTheBoard(boardCase)) {
       return false;
     }
@@ -128,7 +128,7 @@ export class GameBehavior implements GameBehaviorI {
   }
 
   getWords():  string[] {
-    return this.words;
+    return this.words.sort();
   };
 
   public isStopped(): boolean {
@@ -180,8 +180,8 @@ export class GameBehavior implements GameBehaviorI {
 
     const allowedCoordinates = this.buildAllowedCoordinates(lastClickedCase);
 
-    return !!allowedCoordinates.find((coordinates) => 
-      coordinates.x === boardCase.coordinates.x 
+    return !!allowedCoordinates.find((coordinates) =>
+      coordinates.x === boardCase.coordinates.x
       && coordinates.y === boardCase.coordinates.y)
   }
 
@@ -202,7 +202,7 @@ export class GameBehavior implements GameBehaviorI {
         }
       })
     })
-    
+
     return allowedCoordinates;
   }
 
@@ -210,7 +210,7 @@ export class GameBehavior implements GameBehaviorI {
     let allowedAbscissa: number[] = [];
     for (let i=-1; i<=1; i++) {
       const newAbscissa = lastClickedCase.coordinates.x+i;
-      if (newAbscissa >= 0 
+      if (newAbscissa >= 0
         && newAbscissa < this.boardConfig.cols) {
         allowedAbscissa.push(newAbscissa);
       }
@@ -223,12 +223,12 @@ export class GameBehavior implements GameBehaviorI {
       let allowedOrdinate: number[] = [];
       for (let i=-1; i<=1; i++) {
         const newOrdinate = lastClickedCase.coordinates.y+i;
-        if (newOrdinate >= 0 
+        if (newOrdinate >= 0
           && newOrdinate < this.boardConfig.rows) {
           allowedOrdinate.push(newOrdinate);
         }
       }
-  
+
       return allowedOrdinate;
     }
 }

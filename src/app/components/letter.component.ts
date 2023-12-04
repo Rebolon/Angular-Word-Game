@@ -1,16 +1,18 @@
 import { Component, Input } from '@angular/core';
 import { BoardCase, CaseStatus, GameBehavior } from '../services/word-game.interface';
 import { NgClass } from '@angular/common';
+import { MatRippleModule } from '@angular/material/core';
 
 @Component({
   selector: 'my-letter',
   standalone: true,
   imports: [NgClass],
   template: `
-    <div 
-      class="flex-item" 
-      [ngClass]="{hover: mouseOver, clicked: isClicked()}" 
-      (mouseover)="mouseOver = true" 
+    <div
+      matRipple
+      class="flex-item primary"
+      [ngClass]="{hover: mouseOver, clicked: isClicked()}"
+      (mouseover)="mouseOver = true"
       (mouseout)="mouseOver = false"
       (click)="click()">{{case.value.value}}</div>
   `,
@@ -27,10 +29,10 @@ export class LetterComponent {
 
   protected click(): void {
     switch (this.case.getStatus()) {
-      case CaseStatus.CLEAR: 
+      case CaseStatus.CLEAR:
         this.behavior.selectCase(this.case);
         break;
-      case CaseStatus.CLICKED: 
+      case CaseStatus.CLICKED:
         this.behavior.unSelectCase(this.case);
         break;
       default:

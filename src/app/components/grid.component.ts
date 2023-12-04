@@ -12,43 +12,54 @@ import { TitleSelectedGameComponent } from './title-selected-game.component';
 @Component({
   selector: 'my-grid',
   standalone: true,
-  imports: [TitleSelectedGameComponent, LetterComponent, WordsComponent, CountDownComponent, ScoreComponent, MatButtonModule, MatGridListModule, ],
+  imports: [TitleSelectedGameComponent, LetterComponent, WordsComponent, CountDownComponent, ScoreComponent, MatButtonModule, MatGridListModule],
   template: `
-  @if ("board") {
-    <mat-grid-list [cols]="3" rowHeight="2:1">
-      <mat-grid-tile><my-title-selected-game [game]="game" /></mat-grid-tile>
+  @if (board) {
+    <mat-grid-list [cols]="3">
+      <mat-grid-tile>
+        <my-title-selected-game [game]="game" />
+      </mat-grid-tile>
       <mat-grid-tile>
         @if (countDownIsStarted() && !countDownIsEnded()) {
-        <my-countdown [starTime]="countDown()" (ended)="stopGame()" (started)="startGame()"/>
-        }
-        @if (!countDownIsStarted() && countDownIsEnded()) {
-        <h2>Partie finie</h2>
+          <my-countdown [starTime]="countDown()" (ended)="stopGame()" (started)="startGame()"/>
+        } @else if (!countDownIsStarted() && countDownIsEnded()) {
+          <h2 >Partie finie</h2>
         }
       </mat-grid-tile>
       <mat-grid-tile>
-      @if (board.gameBehavior.isStopped()) {
+        @if (board.gameBehavior.isStopped()) {
         <my-score [gameScoring]="board.scoring" [words]="board.gameBehavior.getWords()"></my-score>
-      }
+        }
       </mat-grid-tile>
     </mat-grid-list>
 
-    <button mat-raised-button color="primary" (click)="validateWord()" [disabled]="board.gameBehavior.isStopped()">Ajouter le mot</button>
-    <button mat-raised-button color="accent" (click)="cancelWord()" [disabled]="board.gameBehavior.isStopped()">Annuler</button>
-    @if (board.gameBehavior.isStopped()) {
-      <button mat-raised-button color="primary" (click)="restart()">Rejouer</button>
-    }
+    <mat-grid-list [cols]="getGridListCols()" rowHeight="1:1" gutterSize="10px">
+      <mat-grid-tile [colspan]="board.boardConfig.cols/2" [rowspan]="board.boardConfig.rows+1"></mat-grid-tile>
+      @for (row of board.gameBehavior.gridCases; track row; let rowNumber = $index; let isLastRow = $last) {
+        @for (col of row; track col; let colNumber = $index; let isLastCol = $last) {
+          <mat-grid-tile>
+            <my-letter [case]="col" [behavior]="board.gameBehavior"></my-letter>
+          </mat-grid-tile>
 
-    <mat-grid-list [cols]="board.boardConfig.cols" rowHeight="1:1" gutterSize="10px">
-      @for (row of board.gameBehavior.gridCases; track row) {
-        @for (col of row; track col) {
-        <mat-grid-tile>
-          <my-letter [case]="col" [behavior]="board.gameBehavior"></my-letter>
-        </mat-grid-tile>
+          @if (rowNumber === 0 && (colNumber+1) === board.boardConfig.cols) {
+            <mat-grid-tile [colspan]="board.boardConfig.cols/2+1" [rowspan]="board.boardConfig.rows+1">
+              <mat-grid-tile-header>Mots trouvés</mat-grid-tile-header>
+              <my-words [board]="board" />
+            </mat-grid-tile>
+          }
+
+          @if (isLastRow && isLastCol) {
+            <mat-grid-tile [colspan]="board.boardConfig.cols">
+              <button mat-raised-button color="primary" (click)="validateWord()" [disabled]="board.gameBehavior.isStopped()">Ajouter le mot</button>
+              <button mat-raised-button color="accent" (click)="cancelWord()" [disabled]="board.gameBehavior.isStopped()">Annuler</button>
+              @if (board.gameBehavior.isStopped()) {
+                <button mat-raised-button color="primary" (click)="restart()">Rejouer</button>
+              }
+            </mat-grid-tile>
+          }
         }
       }
     </mat-grid-list>
-
-    <my-words [board]="board" />
   }
   `,
   styleUrls: ['./grid.scss'],
@@ -109,5 +120,15 @@ export class GridComponent implements OnChanges {
     this.countDown.set(120)
     this.countDownIsEnded.set(false);
     this.countDownIsStarted.set(true);
+  }
+
+  protected isLastLetterOfRow(idx: number): boolean {
+    return (idx+1) % this.board.boardConfig.cols === 0
+  }
+
+  protected getGridListCols() {
+    const shifting = this.board.boardConfig.cols%2 ? 2 : 1;
+
+    return this.board.boardConfig.cols*2+shifting
   }
 }

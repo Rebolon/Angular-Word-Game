@@ -1,19 +1,21 @@
-import { NgFor, NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { Game } from '../services/word-game.interface';
+import { MatListModule } from '@angular/material/list';
 
 @Component({
   selector: 'my-words',
   standalone: true,
-  imports: [],
+  imports: [MatListModule],
   template: `
-  @if (hasValidateWords()) {
-    <ul class="flex-container">
-      @for (word of getWords(); track word) {
-      <li>{{word}}</li>
+    <mat-list dense>
+      @if (hasValidateWords()) {
+        @for (word of getWords(); track word) {
+          <mat-list-item>{{word}}</mat-list-item>
+        }
+      } @else {
+        <mat-list-item>aucun</mat-list-item>
       }
-    </ul>
-  }
+    </mat-list>
   `,
   styleUrls: ['./grid.scss'],
 })

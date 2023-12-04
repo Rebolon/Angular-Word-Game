@@ -24,9 +24,9 @@ import { MatButtonModule } from '@angular/material/button';
             name="game"
             title="game">
           @for (gameKey of form.getGamesKeys(); track gameKey) {
-          <mat-option [value]="gameKey">
-          {{ form.getGameValue(gameKey) }}
-          </mat-option>
+            <mat-option [value]="gameKey">
+              {{ form.getGameValue(gameKey) }}
+            </mat-option>
           }
         </mat-select>
       </mat-form-field>

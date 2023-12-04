@@ -23,7 +23,7 @@ import { DbService } from './services/database/db.service';
       @if (game) {
         <my-grid [game]="game" />
       } @else {
-        <my-game-select  [selected]="defaultGame" (selected)="onSelected($event)" />
+        <my-game-select [selected]="defaultGame" (selected)="onSelected($event)" />
       }
     </main>
     <footer>
