@@ -35,9 +35,10 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/manifest.webmanifest"
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
             ],
             "styles": [
               "@angular/material/prebuilt-themes/indigo-pink.css",
@@ -101,9 +102,10 @@
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/manifest.webmanifest"
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
             ],
             "styles": [
               "@angular/material/prebuilt-themes/indigo-pink.css",

@@ -10,10 +10,9 @@ import { MatButtonModule } from '@angular/material/button';
 
 
 @Component({
-  selector: 'my-game-select',
-  standalone: true,
-  imports: [AsyncPipe, ReactiveFormsModule, MatSelectModule, MatButtonModule],
-  template: `
+    selector: 'my-game-select',
+    imports: [AsyncPipe, ReactiveFormsModule, MatSelectModule, MatButtonModule],
+    template: `
     <form
       [formGroup]="form"
       (ngSubmit)="selectGame()">
@@ -34,7 +33,7 @@ import { MatButtonModule } from '@angular/material/button';
       <button mat-raised-button type="submit" [disabled]="dbIsLoading() | async">Jouer</button>
     </form>
   `,
-  styleUrls: ['./game-select.scss'],
+    styleUrls: ['./game-select.scss']
 })
 export class GameSelectComponent {
   @Input('selected') selected!: GameType;

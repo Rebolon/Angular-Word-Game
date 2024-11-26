@@ -3,10 +3,9 @@ import { Game } from '../services/word-game.interface';
 import { MatListModule } from '@angular/material/list';
 
 @Component({
-  selector: 'my-words',
-  standalone: true,
-  imports: [MatListModule],
-  template: `
+    selector: 'my-words',
+    imports: [MatListModule],
+    template: `
     <mat-list dense>
       @if (hasValidateWords()) {
         @for (word of getWords(); track word) {
@@ -17,7 +16,7 @@ import { MatListModule } from '@angular/material/list';
       }
     </mat-list>
   `,
-  styleUrls: ['./grid.scss'],
+    styleUrls: ['./grid.scss']
 })
 export class WordsComponent {
   @Input() board!: Game;

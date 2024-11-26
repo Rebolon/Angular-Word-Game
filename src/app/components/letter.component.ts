@@ -4,10 +4,9 @@ import { NgClass } from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';
 
 @Component({
-  selector: 'my-letter',
-  standalone: true,
-  imports: [NgClass],
-  template: `
+    selector: 'my-letter',
+    imports: [NgClass],
+    template: `
     <div
       matRipple
       class="flex-item primary"
@@ -16,7 +15,7 @@ import { MatRippleModule } from '@angular/material/core';
       (mouseout)="mouseOver = false"
       (click)="click()">{{case.value.value}}</div>
   `,
-  styleUrls: ['./letter.scss'],
+    styleUrls: ['./letter.scss']
 })
 export class LetterComponent {
   @Input({ required: true }) behavior!: GameBehavior;

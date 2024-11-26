@@ -1,43 +1,34 @@
-import { Component, Input, OnChanges, SimpleChanges, signal } from '@angular/core';
-import { AlphabetGame, BoardCase, Game } from '../services/word-game.interface';
-import { LetterComponent } from './letter.component';
-import { WordsComponent } from './words.component';
-import { CountDownComponent } from './countdown.component';
-import { ScoreComponent } from './score.component';
+import { Component, DestroyRef, Input, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { ToastrService } from 'ngx-toastr';
-import { TitleSelectedGameComponent } from './title-selected-game.component';
+import { AlphabetGame, BoardCase, Game } from '../services/word-game.interface';
+import { CountDownComponent } from './countdown.component';
+import { LetterComponent } from './letter.component';
+import { ScoreComponent } from './score.component';
+import { WordsComponent } from './words.component';
 
 @Component({
-  selector: 'my-grid',
-  standalone: true,
-  imports: [TitleSelectedGameComponent, LetterComponent, WordsComponent, CountDownComponent, ScoreComponent, MatButtonModule, MatGridListModule],
-  template: `
+    selector: 'my-grid',
+    imports: [LetterComponent, WordsComponent, CountDownComponent, ScoreComponent, MatButtonModule, MatGridListModule],
+    template: `
   @if (board) {
-    <mat-grid-list [cols]="3">
-      <mat-grid-tile>
-        <my-title-selected-game [game]="game" />
-      </mat-grid-tile>
-      <mat-grid-tile>
-        @if (countDownIsStarted() && !countDownIsEnded()) {
-          <my-countdown [starTime]="countDown()" (ended)="stopGame()" (started)="startGame()"/>
-        } @else if (!countDownIsStarted() && countDownIsEnded()) {
-          <h2 >Partie finie</h2>
-        }
-      </mat-grid-tile>
-      <mat-grid-tile>
-        @if (board.gameBehavior.isStopped()) {
-        <my-score [gameScoring]="board.scoring" [words]="board.gameBehavior.getWords()"></my-score>
-        }
-      </mat-grid-tile>
-    </mat-grid-list>
+    @if (countDownIsStarted() && !countDownIsEnded()) {
+      <my-countdown [starTime]="countDown()" (ended)="stopGame()" (started)="startGame()"/>
+    } @else if (!countDownIsStarted() && countDownIsEnded()) {
+      <h2 >Partie finie</h2>
+    }
+
+    @if (board.gameBehavior.isStopped()) {
+      <my-score [gameScoring]="board.scoring" [words]="board.gameBehavior.getWords()"></my-score>
+    }
 
     <mat-grid-list [cols]="getGridListCols()" rowHeight="1:1" gutterSize="10px">
       <mat-grid-tile [colspan]="board.boardConfig.cols/2" [rowspan]="board.boardConfig.rows+1"></mat-grid-tile>
       @for (row of board.gameBehavior.gridCases; track row; let rowNumber = $index; let isLastRow = $last) {
         @for (col of row; track col; let colNumber = $index; let isLastCol = $last) {
-          <mat-grid-tile>
+          <mat-grid-tile class="letter">
             <my-letter [case]="col" [behavior]="board.gameBehavior"></my-letter>
           </mat-grid-tile>
 
@@ -62,7 +53,7 @@ import { TitleSelectedGameComponent } from './title-selected-game.component';
     </mat-grid-list>
   }
   `,
-  styleUrls: ['./grid.scss'],
+    styleUrls: ['./grid.scss']
 })
 export class GridComponent implements OnChanges {
   @Input({ required: true }) game!: AlphabetGame;
@@ -70,12 +61,13 @@ export class GridComponent implements OnChanges {
   protected countDown = signal(0);
   protected countDownIsStarted = signal(false);
   protected countDownIsEnded = signal(false);
+  private destroy = inject(DestroyRef)
 
   constructor (private toastrService: ToastrService) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
     const game = changes['game'].currentValue as unknown as AlphabetGame;
-    game.currentGame$.subscribe((currentGame) => this.board = currentGame)
+    game.currentGame$.pipe(takeUntilDestroyed(this.destroy)).subscribe((currentGame) => this.board = currentGame)
     this.restart()
   }
 
@@ -93,7 +85,7 @@ export class GridComponent implements OnChanges {
 
   protected validateWord(): void {
     try {
-      this.board.gameBehavior.validateWord().subscribe({
+      this.board.gameBehavior.validateWord().pipe(takeUntilDestroyed(this.destroy)).subscribe({
         error: (err) => this.toastrService.warning(err)
       });
     } catch (e) {

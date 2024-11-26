@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {CommonModule, NgOptimizedImage} from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import {GridComponent} from './components/grid.component';
 import {Boggle} from './services/boggle/boggle.service';
 import {Alphabet} from './services/alphabet/alphabet.service';
@@ -11,11 +11,10 @@ import { MESSAGES_RESPONSE } from './services/database/messages-response';
 import { DbService } from './services/database/db.service';
 
 @Component({
-  selector: 'my-app',
-  standalone: true,
-  imports: [CommonModule, TitleComponent, GridComponent, GameSelectComponent, ],
-  providers: [Alphabet, Boggle],
-  template: `
+    selector: 'my-app',
+    imports: [TitleComponent, GridComponent, GameSelectComponent],
+    providers: [Alphabet, Boggle],
+    template: `
     <header>
       <my-title/>
     </header>
@@ -29,7 +28,7 @@ import { DbService } from './services/database/db.service';
     <footer>
     </footer>
   `,
-  styleUrls: ['./app.scss',]
+    styleUrls: ['./app.scss',]
 })
 export class AppComponent implements OnInit {
   protected defaultGame = GameType.Alphabet

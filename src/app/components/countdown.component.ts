@@ -1,19 +1,22 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReplaySubject, Subject, combineLatestWith, finalize, interval, map, share, takeWhile, tap } from 'rxjs';
+import { inject } from '@angular/core';
+import { DestroyRef } from '@angular/core';
 
 @Component({
-  selector: 'my-countdown',
-  standalone: true,
-  imports: [AsyncPipe],
-  template: `
+    selector: 'my-countdown',
+    imports: [AsyncPipe],
+    template: `
     <h2>{{time$ | async}}</h2>
-  `,
+  `
 })
 export class CountDownComponent implements OnChanges, OnInit {
   @Input({ required: true }) starTime!: number | null;
   @Output() started: EventEmitter<true> = new EventEmitter();
   @Output() ended: EventEmitter<true> = new EventEmitter();
+  private destroy = inject(DestroyRef)
 
   private startTime$: Subject<number> = new ReplaySubject(1);
   private myInterval = this.startTime$.pipe(
@@ -60,7 +63,7 @@ export class CountDownComponent implements OnChanges, OnInit {
   }
 
   ngOnInit(): void {
-    this.startTime$.subscribe({
+    this.startTime$.pipe(takeUntilDestroyed(this.destroy)).subscribe({
       next: (value) => console.info('onInit next', value),
       complete: () => console.warn('startTime$ complete')
     })
