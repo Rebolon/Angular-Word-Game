@@ -54,7 +54,7 @@ addEventListener('message', ({ data }) => {
           return populate$(databaseCount).pipe(
             tap((progress) => postMessage(`${MESSAGES_RESPONSE.DB_IN_PROGRESS} ${progress} mots`))
           );
-        } 
+        }
         return of(100)
       })
     )
@@ -66,7 +66,7 @@ addEventListener('message', ({ data }) => {
 });
 
 const response$: Observable<AjaxResponse<string>> = ajax({
-  url: '/assets/dictionnaries/fr/ods6.txt',
+  url: '/dictionnaries/fr/ods6.txt',
   headers: {
     "Accept": "text"
   },
